@@ -556,7 +556,19 @@ function take(){
 function setWait(t){ el("waitText").textContent = t || ""; el("wait").hidden = !t; }
 function setMsg(t){ el("msg").textContent = t || ""; el("msg").hidden = !t; }
 function setBusy(on){ busy = on; ["read","another","next"].forEach(id => el(id).disabled = on); }
-const firstSentences = (t, n) => (t.replace(/\s+/g," ").match(/[^.!?]+[.!?]+(\s|$)/g) || [t]).slice(0, n).join("").trim();
+// Split into sentences without tripping on decimals (1.2%) or abbreviations (a.m., U.S., St.), and never drop the start.
+const ABBR_END = /(?:\b[A-Za-z]|\b(?:[a-z]\.)+[a-z]|\b(?:Mr|Mrs|Ms|Dr|St|Jr|Sr|Mt|Ft|No|Lt|Col|Gen|Capt|Sgt|Rev|vs|etc|approx|ca|Inc|Co|Corp|Ltd|Jan|Feb|Mar|Apr|Aug|Sept?|Oct|Nov|Dec))\.$/;
+function firstSentences(t, n){
+  t = (t || "").replace(/\s+/g, " ").trim();
+  const out = []; let start = 0, m;
+  const re = /[.!?]["'”’)]*\s+(?=["“(]?[A-Z0-9])/g;
+  while(out.length < n && (m = re.exec(t))){
+    if(ABBR_END.test(t.slice(start, m.index + 1))) continue;
+    out.push(t.slice(start, m.index + m[0].length).trim()); start = m.index + m[0].length;
+  }
+  if(out.length < n && start < t.length) out.push(t.slice(start).trim());
+  return out.join(" ");
+}
 const mins = w => w ? Math.max(1, Math.round(w/230)) + " min read" : "";
 
 function showCard(c){

@@ -127,10 +127,10 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .tab .dot{position:absolute;top:7px;left:calc(50% + 9px);min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--lamp);color:#24190b;font-size:10px;font-weight:700;display:grid;place-items:center;letter-spacing:0}
 .mini{bottom:calc(84px + env(safe-area-inset-bottom, 0px)) !important}
 /* ---- Browse: tap into a section, back to all sections ---- */
-.eraRow{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-radius:var(--r);
+.eraRow{all:unset;box-sizing:border-box;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-radius:var(--r);
   border:1px solid color-mix(in srgb,var(--brass) 30%,var(--rule));background:linear-gradient(180deg,var(--folder-hi),var(--folder));box-shadow:inset 0 1px 0 rgba(255,220,160,.06)}
 .eraRow .k{font-family:var(--f-ui);font-size:14px;letter-spacing:.08em;color:var(--soft)}
-.eraRow b{font-family:var(--f-body);font-weight:500;font-size:18px;color:var(--paper);margin-left:auto}
+.eraRow b{font-family:var(--f-body);font-weight:500;font-size:17px;color:var(--paper);margin-left:auto}
 .eraRow .chev{color:var(--lamp)}
 .eraRow:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
 .bframe{position:relative;overflow:hidden;border-radius:var(--r-lg);border:1px solid color-mix(in srgb,var(--brass) 30%,var(--rule));
@@ -161,15 +161,6 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .bhead p{margin:0;font-style:italic;color:var(--soft);font-size:15px}
 .sicon{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--brass) 55%,transparent);color:var(--brass-hi);background:radial-gradient(circle at 50% 35%,rgba(240,190,100,.14),transparent 70%)}
 .sicon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
-.erablock{display:flex;flex-direction:column;gap:10px;position:sticky;top:0;z-index:6;margin:0 -16px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 12px;
-  transition:background-color .25s var(--ease)}
-.erablock.stuck{background:linear-gradient(180deg,rgba(13,24,18,.97) 75%,rgba(13,24,18,0));backdrop-filter:blur(6px)}
-.erablock .k{font-family:var(--f-ui);font-size:14px;letter-spacing:.08em;color:var(--soft);padding-left:2px}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip2{all:unset;cursor:pointer;font-family:var(--f-ui);font-size:15px;letter-spacing:.03em;color:var(--paper);padding:8px 14px;border-radius:999px;
-  border:1px solid color-mix(in srgb,var(--brass) 35%,var(--rule));background:color-mix(in srgb,var(--folder) 80%,transparent);transition:background-color .2s var(--ease),color .2s,border-color .2s}
-.chip2[aria-pressed="true"]{background:linear-gradient(180deg,#e9c066,var(--lamp) 60%,#b98a32);border-color:#b98a32;color:#24190b;font-weight:700}
-.chip2:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
 .surprise{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:14px;width:100%;padding:14px 18px;border-radius:var(--r);
   border:1px solid var(--brass);background:radial-gradient(120% 140% at 0% 50%,rgba(240,190,100,.13),transparent 60%),color-mix(in srgb,var(--folder) 85%,transparent);
   box-shadow:inset 0 1px 0 rgba(255,220,160,.1),0 10px 24px -16px rgba(212,166,64,.5);transition:transform .15s var(--ease),background-color .2s}
@@ -220,8 +211,8 @@ html.calm *,html.calm *::before,html.calm *::after{animation:none!important;tran
 .sheet .grabzone{display:none}
 .sheet .grab{width:42px;height:4px;border-radius:4px;background:var(--rule-hi);margin:0 auto}
 .sheet .sh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 20px 12px;border-bottom:1px solid var(--rule);touch-action:none}
-.sheet .sh b{font-family:var(--f-display);font-size:22px;font-weight:700;color:var(--paper)}
-.sheet .sh .more{font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.sheet .sh b{font-family:var(--f-head);font-size:24px;font-weight:600;color:var(--paper)}
+.sheet .sh .more{font-size:15px;letter-spacing:.04em;text-transform:none}
 .sheetBody{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:6px}
 .srow{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:13px 20px;cursor:pointer;
   border-bottom:1px solid color-mix(in srgb,var(--rule) 60%,transparent);font-family:var(--f-body);font-size:18px;line-height:1.3;color:var(--paper)}
@@ -469,7 +460,7 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
 
   <section class="view" id="view-browse" hidden aria-labelledby="browseTitle">
     <div class="vhead"><h2 id="browseTitle">Browse the Files</h2><div class="orn-rule" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 0l6 6-6 6-6-6z" fill="currentColor"/></svg></div></div>
-    <div class="erablock"><span class="k" id="eraK">Era</span><div class="chips" id="eraChips" role="group" aria-labelledby="eraK"></div></div>
+    <button class="eraRow" id="eraBtn" type="button" aria-controls="sheet" aria-expanded="false"><span class="k">Era</span><b id="eraLabel2"></b><span class="chev">›</span></button>
     <p class="nowline" id="nowLine"></p>
     <div class="bframe" id="bframe"><div class="bpages" id="bpages"><div class="bpage" id="bpMain"></div><div class="bpage" id="bpSub"></div></div></div>
     <button class="surprise" id="surpriseBtn" type="button"><span class="sicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.6L20 9.3l-4.5 3.9 1.4 5.8L12 16l-4.9 3 1.4-5.8L4 9.3l5.8-.7z"/></svg></span><span class="txt"><b>Surprise me</b><small>Any dark story, from any section</small></span></button>
@@ -714,7 +705,19 @@ function take(){
 function setWait(t){ el("waitText").textContent = t || ""; el("wait").hidden = !t; }
 function setMsg(t){ el("msg").textContent = t || ""; el("msg").hidden = !t; if(!t && el("widen")) el("widen").hidden = true; }
 function setBusy(on){ busy = on; ["read","another","next"].forEach(id => el(id).disabled = on); }
-const firstSentences = (t, n) => (t.replace(/\s+/g," ").match(/[^.!?]+[.!?]+(\s|$)/g) || [t]).slice(0, n).join("").trim();
+// Split into sentences without tripping on decimals (1.2%) or abbreviations (a.m., U.S., St.), and never drop the start.
+const ABBR_END = /(?:\b[A-Za-z]|\b(?:[a-z]\.)+[a-z]|\b(?:Mr|Mrs|Ms|Dr|St|Jr|Sr|Mt|Ft|No|Lt|Col|Gen|Capt|Sgt|Rev|vs|etc|approx|ca|Inc|Co|Corp|Ltd|Jan|Feb|Mar|Apr|Aug|Sept?|Oct|Nov|Dec))\.$/;
+function firstSentences(t, n){
+  t = (t || "").replace(/\s+/g, " ").trim();
+  const out = []; let start = 0, m;
+  const re = /[.!?]["'”’)]*\s+(?=["“(]?[A-Z0-9])/g;
+  while(out.length < n && (m = re.exec(t))){
+    if(ABBR_END.test(t.slice(start, m.index + 1))) continue;
+    out.push(t.slice(start, m.index + m[0].length).trim()); start = m.index + m[0].length;
+  }
+  if(out.length < n && start < t.length) out.push(t.slice(start).trim());
+  return out.join(" ");
+}
 const mins = w => w ? Math.max(1, Math.round(w/230)) + " min read" : "";
 
 function showCard(c){
@@ -1044,7 +1047,7 @@ function refilter(){ state.queue = {key:"", items:[]}; save(); renderFilters(); 
 function renderFilters(){
   el("catLabel").textContent = CATS[state.filters.cat].label;
   el("eraLabel").textContent = eraSummary();
-  if(el("eraChips")) renderEraChips();
+  if(el("eraLabel2")){ el("eraLabel2").textContent = eraSummary(); el("eraBtn").setAttribute("aria-expanded", String(sheetKind === "era")); }
   if(typeof renderBrowse === "function") renderBrowse();
 }
 const SECTION_BLURBS = {
@@ -1148,7 +1151,7 @@ function eraChanged(){
 }
 // hang the panel just under the filter buttons (or near the top if they've scrolled away)
 function placeSheet(){
-  const r = (el("eraBtn") || el("eraChips")).getBoundingClientRect();
+  const r = el("eraBtn").getBoundingClientRect();
   const top = Math.max(12, Math.min(r.bottom + 10, window.innerHeight * 0.35));
   document.documentElement.style.setProperty("--sheet-top", top + "px");
 }
@@ -1181,7 +1184,10 @@ function closeSheet(fromHistory){
   setTimeout(() => { if(!sheetKind){ sh.hidden = true; sc.hidden = true; } }, reduce() ? 0 : 320);
   renderFilters();
   if(!fromHistory && history.state && history.state.nfSheet){ ignorePop = true; history.back(); }
-  if(was === "era" && state.filters.eras.join(",") !== erasBefore) setTimeout(refilter, reduce() ? 0 : 200);
+  if(was === "era" && state.filters.eras.join(",") !== erasBefore){
+    if(!catFits(state.filters.cat)){ toast((CATS[state.filters.cat] || {}).label + " has nothing from that era, so you're on Surprise me."); state.filters.cat = "any"; save(); renderFilters(); }
+    setTimeout(refilter, reduce() ? 0 : 200);
+  }
 }
 function pickCat(k){
   const changed = state.filters.cat !== k;
@@ -1537,27 +1543,15 @@ function showView(name, toTop){
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
 el("ctxBtn").addEventListener("click", () => showView("browse", true));
 el("surpriseBtn").addEventListener("click", () => pickCat("any"));
+el("eraBtn").addEventListener("click", () => openSheet("era"));
 
 /* ---------- era chips: tap to toggle, stories update a moment after the last tap ---------- */
 var eraTimer = 0, toastTimer = 0;
-addEventListener("scroll", () => { const eb = document.querySelector(".erablock"); if(eb && currentView === "browse") eb.classList.toggle("stuck", eb.getBoundingClientRect().top <= 1 && scrollY > 40); }, {passive:true});
 function toast(t){
   const b = el("toast"); b.textContent = t; b.classList.add("on");
   clearTimeout(toastTimer); toastTimer = setTimeout(() => b.classList.remove("on"), 3600);
 }
 el("widen").addEventListener("click", () => { el("widen").hidden = true; setEras([]); clearTimeout(eraTimer); refilter(); });
-function renderEraChips(){
-  const ERA_SHORT = {pre1900:"Pre‑1900", "1900s":"1900–49", "1950s":"1950–89", "1990s":"1990–2009", "2010s":"2010–now"};
-  const box = el("eraChips"); box.innerHTML = "";
-  const mk = (label, on, fn) => { const b = document.createElement("button"); b.type = "button"; b.className = "chip2"; b.textContent = label; b.setAttribute("aria-pressed", String(on)); b.addEventListener("click", fn); box.append(b); };
-  mk("Any", !state.filters.eras.length, () => setEras([]));
-  ERAS.forEach(e => mk(ERA_SHORT[e.k] || e.label, state.filters.eras.includes(e.k), () => {
-    const set = new Set(state.filters.eras); set.has(e.k) ? set.delete(e.k) : set.add(e.k);
-    let list = ERAS.map(x => x.k).filter(x => set.has(x));
-    if(list.length === ERAS.length) list = [];
-    setEras(list);
-  }));
-}
 function setEras(list){
   if(list.join(",") === state.filters.eras.join(",")) return;
   state.filters.eras = list;
@@ -1641,6 +1635,12 @@ el("clearRecent").addEventListener("click", () => {
 applyCalm();
 
 applySize(); renderFilters(); renderLib();
+// an old saved pick that doesn't fit its era becomes Surprise me
+if(!catFits(state.filters.cat)){
+  const was = (CATS[state.filters.cat] || {}).label;
+  state.filters.cat = "any"; state.queue = {key:"", items:[]}; save(); renderFilters();
+  if(was) setTimeout(() => toast(was + " has nothing from that era, so you're on Surprise me."), 600);
+}
 findStory();
 setTimeout(backfillThumbs, 2500);
 
