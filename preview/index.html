@@ -136,7 +136,7 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .bframe{position:relative;overflow:hidden;border-radius:var(--r-lg);border:1px solid color-mix(in srgb,var(--brass) 30%,var(--rule));
   background:repeating-linear-gradient(92deg,rgba(255,235,200,.012) 0 2px,transparent 2px 9px),linear-gradient(180deg,var(--folder-hi),var(--folder));
   box-shadow:inset 0 1px 0 rgba(255,220,160,.07),0 24px 50px -26px #000;transition:height .45s var(--ease)}
-.bpages{display:flex;width:200%;transition:transform .45s cubic-bezier(.22,.8,.2,1)}
+.bpages{display:flex;align-items:flex-start;width:200%;transition:transform .45s cubic-bezier(.22,.8,.2,1)}
 .bpages.insub{transform:translateX(-50%)}
 .bpage{width:50%;flex:none}
 .brow{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:14px;width:100%;padding:16px 18px;border-bottom:1px solid color-mix(in srgb,var(--rule) 70%,transparent);transition:background-color .2s}
@@ -161,7 +161,9 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .bhead p{margin:0;font-style:italic;color:var(--soft);font-size:15px}
 .sicon{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--brass) 55%,transparent);color:var(--brass-hi);background:radial-gradient(circle at 50% 35%,rgba(240,190,100,.14),transparent 70%)}
 .sicon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
-.erablock{display:flex;flex-direction:column;gap:10px}
+.erablock{display:flex;flex-direction:column;gap:10px;position:sticky;top:0;z-index:6;margin:0 -16px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 12px;
+  transition:background-color .25s var(--ease)}
+.erablock.stuck{background:linear-gradient(180deg,rgba(13,24,18,.97) 75%,rgba(13,24,18,0));backdrop-filter:blur(6px)}
 .erablock .k{font-family:var(--f-ui);font-size:14px;letter-spacing:.08em;color:var(--soft);padding-left:2px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip2{all:unset;cursor:pointer;font-family:var(--f-ui);font-size:15px;letter-spacing:.03em;color:var(--paper);padding:8px 14px;border-radius:999px;
@@ -176,6 +178,11 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .surprise .txt{display:flex;flex-direction:column;gap:2px}
 .surprise b{font-family:var(--f-head);font-weight:600;font-size:22px;color:var(--lamp);line-height:1.15}
 .surprise small{font-style:italic;font-size:15px;color:var(--soft)}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);opacity:0;z-index:40;max-width:min(92vw,520px);
+  padding:10px 16px;border-radius:var(--r);border:1px solid var(--brass);background:rgba(36,27,19,.97);color:var(--paper);font-size:15px;text-align:center;
+  box-shadow:0 14px 30px -14px #000;pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+#widen{margin:-6px 20px 18px}
 .nowline{margin:4px 0 -10px;font-family:var(--f-ui);font-size:14px;letter-spacing:.05em;color:var(--soft);text-align:center}
 .nowline b{font-weight:500;color:var(--lamp)}
 .brow .dot{width:7px;height:7px;border-radius:50%;background:var(--lamp);box-shadow:0 0 8px rgba(224,170,80,.7);flex:none}
@@ -415,6 +422,7 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
       <div class="sk-body"><div class="sk sk-line w30"></div><div class="sk sk-line big w80"></div><div class="sk sk-line w95"></div><div class="sk sk-line w60"></div><p class="sk-text" id="waitText">Opening the case file…</p></div>
     </div>
     <p class="msg" id="msg" hidden></p>
+    <button class="small" id="widen" type="button" hidden>Widen to any era</button>
     <div id="card" hidden>
       <div class="heroBox" id="heroBox" hidden><img class="hero" id="hero" alt=""></div>
       <div class="strip" id="strip" hidden aria-label="Photos from this story"></div>
@@ -462,9 +470,9 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
   <section class="view" id="view-browse" hidden aria-labelledby="browseTitle">
     <div class="vhead"><h2 id="browseTitle">Browse the Files</h2><div class="orn-rule" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 0l6 6-6 6-6-6z" fill="currentColor"/></svg></div></div>
     <div class="erablock"><span class="k" id="eraK">Era</span><div class="chips" id="eraChips" role="group" aria-labelledby="eraK"></div></div>
-    <button class="surprise" id="surpriseBtn" type="button"><span class="sicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.6L20 9.3l-4.5 3.9 1.4 5.8L12 16l-4.9 3 1.4-5.8L4 9.3l5.8-.7z"/></svg></span><span class="txt"><b>Surprise me</b><small>Any dark story, from any section</small></span></button>
     <p class="nowline" id="nowLine"></p>
     <div class="bframe" id="bframe"><div class="bpages" id="bpages"><div class="bpage" id="bpMain"></div><div class="bpage" id="bpSub"></div></div></div>
+    <button class="surprise" id="surpriseBtn" type="button"><span class="sicon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 5.6L20 9.3l-4.5 3.9 1.4 5.8L12 16l-4.9 3 1.4-5.8L4 9.3l5.8-.7z"/></svg></span><span class="txt"><b>Surprise me</b><small>Any dark story, from any section</small></span></button>
   </section>
 
   <section class="view" id="view-saved" hidden aria-labelledby="savedTitle">
@@ -487,6 +495,7 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
   </section>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <nav class="tabbar" aria-label="Sections">
   <div class="in">
     <button class="tab" id="tab-tonight" type="button" data-view="tonight" aria-current="page"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>Tonight</button>
@@ -588,6 +597,14 @@ const SECTIONS = [
 const CATS = {any:{label:"Surprise me"}};
 SECTIONS.forEach(([, c]) => Object.assign(CATS, c));
 const SURPRISE = Object.keys(CATS).filter(k => k !== "any" && k !== "unsolved");
+// earliest year each category has real stories; anything not listed goes back through history
+const CAT_FROM = {web:1990, internet:1990, space:1950, air:1900, nuclear:1900, ufo:1900, signals:1900, diving:1900, experiments:1900, spree:1900};
+function catFits(k, eras){
+  const sel = eras || state.filters.eras;
+  if(!sel.length || k === "any") return true;
+  const from = CAT_FROM[k] || 0;
+  return ERAS.some(e => sel.includes(e.k) && e.max >= from);
+}
 const ERAS = [
   {k:"pre1900", label:"Before 1900", min:0,    max:1899},
   {k:"1900s",   label:"1900–1949",   min:1900, max:1949},
@@ -672,7 +689,7 @@ const isSeen = t => state.seen.map(norm).includes(norm(t));
 async function batch(){
   const tries = state.filters.eras.length && state.filters.eras.length < 3 ? 7 : 4;
   for(let attempt = 0; attempt < tries; attempt++){
-    const catKey = state.filters.cat === "any" ? pickOne(SURPRISE) : state.filters.cat;
+    const catKey = state.filters.cat === "any" ? pickOne(SURPRISE.filter(k => catFits(k))) : state.filters.cat;
     const cat = CATS[catKey];
     for(const q of shuffle(cat.q)){
       const pool = (await searchPool(q)).filter(r => !BLOCK.test(r.title) && !BLOCK_DATE.test(r.title) && !isSeen(r.title) && r.size >= 9000);
@@ -695,7 +712,7 @@ function take(){
 
 /* ---------- UI helpers ---------- */
 function setWait(t){ el("waitText").textContent = t || ""; el("wait").hidden = !t; }
-function setMsg(t){ el("msg").textContent = t || ""; el("msg").hidden = !t; }
+function setMsg(t){ el("msg").textContent = t || ""; el("msg").hidden = !t; if(!t && el("widen")) el("widen").hidden = true; }
 function setBusy(on){ busy = on; ["read","another","next"].forEach(id => el(id).disabled = on); }
 const firstSentences = (t, n) => (t.replace(/\s+/g," ").match(/[^.!?]+[.!?]+(\s|$)/g) || [t]).slice(0, n).join("").trim();
 const mins = w => w ? Math.max(1, Math.round(w/230)) + " min read" : "";
@@ -916,7 +933,7 @@ async function findStory(){
     const items = await batch();
     setBusy(false); setWait("");
     if(findAgain || qKey() !== startKey){ findStory(); return; }
-    if(!items.length){ setMsg("Couldn't find a new story in this category right now. Tap Different story or pick another category."); if(state.current) showCard(state.current); return; }
+    if(!items.length){ setMsg(state.filters.eras.length ? "Couldn't find a new story from this era right now." : "Couldn't find a new story in this category right now. Tap Different story or pick another category."); el("widen").hidden = !state.filters.eras.length; if(state.current) showCard(state.current); return; }
     state.queue = {key:qKey(), items:items.slice(1)};
     present(items[0]);
     setTimeout(prefetch, 1200);
@@ -1522,7 +1539,13 @@ el("ctxBtn").addEventListener("click", () => showView("browse", true));
 el("surpriseBtn").addEventListener("click", () => pickCat("any"));
 
 /* ---------- era chips: tap to toggle, stories update a moment after the last tap ---------- */
-var eraTimer = 0;
+var eraTimer = 0, toastTimer = 0;
+addEventListener("scroll", () => { const eb = document.querySelector(".erablock"); if(eb && currentView === "browse") eb.classList.toggle("stuck", eb.getBoundingClientRect().top <= 1 && scrollY > 40); }, {passive:true});
+function toast(t){
+  const b = el("toast"); b.textContent = t; b.classList.add("on");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => b.classList.remove("on"), 3600);
+}
+el("widen").addEventListener("click", () => { el("widen").hidden = true; setEras([]); clearTimeout(eraTimer); refilter(); });
 function renderEraChips(){
   const ERA_SHORT = {pre1900:"Pre‑1900", "1900s":"1900–49", "1950s":"1950–89", "1990s":"1990–2009", "2010s":"2010–now"};
   const box = el("eraChips"); box.innerHTML = "";
@@ -1537,7 +1560,12 @@ function renderEraChips(){
 }
 function setEras(list){
   if(list.join(",") === state.filters.eras.join(",")) return;
-  state.filters.eras = list; save(); renderFilters();
+  state.filters.eras = list;
+  if(!catFits(state.filters.cat)){
+    toast((CATS[state.filters.cat] || {}).label + " has nothing from that era, so you're on Surprise me.");
+    state.filters.cat = "any";
+  }
+  save(); renderFilters();
   if(navigator.vibrate) try{ navigator.vibrate(6); }catch(e){}
   clearTimeout(eraTimer); eraTimer = setTimeout(refilter, 900);
 }
@@ -1566,7 +1594,7 @@ function renderBrowse(reset){
   if(!el("bpMain")) return;
   const main = el("bpMain"), sub = el("bpSub");
   main.innerHTML = "";
-  SECTIONS.forEach(([name, group]) => main.append(brow({name, blurb:SECTION_BLURBS[name], icon:SECTION_ICONS[name], chev:true, dot: state.filters.cat in group, onClick: () => enterSection(name)})));
+  SECTIONS.filter(([, group]) => Object.keys(group).some(k => catFits(k))).forEach(([name, group]) => main.append(brow({name, blurb:SECTION_BLURBS[name], icon:SECTION_ICONS[name], chev:true, dot: state.filters.cat in group, onClick: () => enterSection(name)})));
   const catName = state.filters.cat === "any" ? "Surprise me" : (CATS[state.filters.cat] || {}).label || "Surprise me";
   el("nowLine").innerHTML = "Now reading: <b></b> · <span></span>";
   el("nowLine").querySelector("b").textContent = catName;
@@ -1580,7 +1608,7 @@ function renderBrowse(reset){
     const h = document.createElement("h3"); h.textContent = browsePage;
     const p = document.createElement("p"); p.textContent = SECTION_BLURBS[browsePage] || "";
     head.append(back, h, p); sub.append(head);
-    Object.keys(group).forEach(k => sub.append(brow({name: group[k].label, item:true, on: state.filters.cat === k, onClick: () => pickCat(k)})));
+    Object.keys(group).filter(k => catFits(k)).forEach(k => sub.append(brow({name: group[k].label, item:true, on: state.filters.cat === k, onClick: () => pickCat(k)})));
   }
   el("bpages").classList.toggle("insub", !!browsePage);
   if(reset) el("bpages").classList.remove("insub");
