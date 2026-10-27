@@ -568,7 +568,7 @@ function sanitize(html){
     const w = +img.getAttribute("width") || 0;
     let s = img.getAttribute("src") || img.getAttribute("data-src") || "";
     if(s.startsWith("//")) s = "https:" + s;
-    if(!/^https:\/\/upload\.wikimedia\.org\//.test(s) || (w && w < 50)){ img.remove(); return; }
+    if(!/^https:\/\/(upload|thumb|maps)\.wikimedia\.org\//.test(s) || (w && w < 50) || /Question_book|Edit-clear|Ambox|Wiki_letter|Symbol_/i.test(s)){ img.remove(); return; }
     s = s.replace(/\/(\d+)px-/, (m, n) => +n < 640 ? "/640px-" : m);
     img.setAttribute("src", s); img.setAttribute("loading", "lazy");
   });
