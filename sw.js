@@ -2,7 +2,7 @@
 // The app always checks GitHub for a newer copy first, so updates show up right away;
 // the saved copy is only used when there's no connection.
 // Wikipedia requests are never cached, so stories stay current.
-const CACHE = "nightfile-v21";
+const CACHE = "nightfile-v22";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
