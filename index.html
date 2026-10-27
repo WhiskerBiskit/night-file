@@ -798,7 +798,13 @@ el("search").addEventListener("submit", ev => { ev.preventDefault(); const q = e
 applySize(); renderFilters(); renderLib();
 findStory();
 
-if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+if("serviceWorker" in navigator && location.protocol === "https:"){
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js", {updateViaCache: "none"}).then(r => r.update()).catch(() => {});
+  // when a new version installs, reload once so it shows up right away
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if(hadController && !reloaded){ reloaded = true; location.reload(); } });
+}
 </script>
 </body>
 </html>
