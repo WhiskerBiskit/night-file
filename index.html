@@ -108,8 +108,10 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .sub{background:color-mix(in srgb,var(--ink) 45%,transparent);animation:drop .25s var(--ease) both}
 .sub .srow{padding-left:34px;font-size:17px}
 .srow[role="checkbox"][aria-checked="true"]{color:var(--lamp)}
-.srow .lbl{border-radius:999px;transition:background-color .25s var(--ease),color .25s var(--ease),padding .25s var(--ease)}
-.srow[role="radio"][aria-checked="true"] .lbl{background:linear-gradient(180deg,#e0b450,var(--lamp));color:#22180b;padding:5px 16px;margin:-5px 0 -5px -16px;font-weight:500;box-shadow:0 4px 14px -6px rgba(212,166,64,.6)}
+.srow[role="radio"][aria-checked="true"]{color:var(--lamp)}
+/* the section you're in (or "Surprise me") gets a subtle gold box */
+.srow.current{margin:6px 10px;width:calc(100% - 20px);padding-left:10px;padding-right:10px;border:1px solid color-mix(in srgb,var(--lamp) 70%,transparent);border-radius:6px;
+  background:color-mix(in srgb,var(--lamp) 9%,transparent);transition:background-color .25s var(--ease),border-color .25s var(--ease)}
 .box{flex:none;width:22px;height:22px;display:grid;place-items:center;font-size:14px;font-weight:700;line-height:1;color:#22180b;transition:background-color .2s,border-color .2s}
 .box{border-radius:5px;border:1.5px solid var(--rule-hi);position:relative}
 .srow[aria-checked="true"] .box::before,.srow[aria-checked="true"] .box::after{content:"";position:absolute;left:50%;top:50%;width:13px;height:2.4px;border-radius:2px;background:#22180b}
@@ -847,7 +849,7 @@ function renderFilters(){
   el("eraBtn").setAttribute("aria-expanded", String(sheetKind === "era"));
 }
 function srow(label, opts){
-  const b = document.createElement("button"); b.type = "button"; b.className = "srow" + (opts.sec ? " sec" : "");
+  const b = document.createElement("button"); b.type = "button"; b.className = "srow" + (opts.sec ? " sec" : "") + (opts.current ? " current" : "");
   const t = document.createElement("span"); t.className = "lbl"; t.textContent = label; b.append(t);
   if(opts.sec){ b.setAttribute("aria-expanded", String(!!opts.open)); const c = document.createElement("span"); c.className = "chev"; c.textContent = "▸"; b.append(c); }
   else {
@@ -863,10 +865,10 @@ function renderSheet(){
   body.innerHTML = ""; foot.innerHTML = ""; foot.hidden = true;
   if(sheetKind === "cat"){
     el("sheetTitle").textContent = "Choose a category";
-    body.append(srow("Surprise me", {on: state.filters.cat === "any", onClick: () => pickCat("any")}));
+    body.append(srow("Surprise me", {on: state.filters.cat === "any", current: state.filters.cat === "any", onClick: () => pickCat("any")}));
     SECTIONS.forEach(([name, group]) => {
       const open = openSection === name;
-      body.append(srow(name, {sec: true, open, onClick: () => { openSection = open ? null : name; renderSheet(); }}));
+      body.append(srow(name, {sec: true, open, current: state.filters.cat in group, onClick: () => { openSection = open ? null : name; renderSheet(); }}));
       if(open){
         const sub = document.createElement("div"); sub.className = "sub";
         Object.keys(group).forEach(k => sub.append(srow(group[k].label, {on: state.filters.cat === k, onClick: () => pickCat(k)})));
