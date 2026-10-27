@@ -227,49 +227,51 @@ const shuffle = a => { a = [...a]; for(let i=a.length-1;i>0;i--){ const j=Math.f
 const norm = s => String(s||"").trim().toLowerCase();
 
 /* Each category: Wikipedia search queries (CirrusSearch). Category and template queries are sampled at random; keyword queries by relevance. */
+// Wikipedia category list helper: C("A|B") -> incategory:A|B (any of them)
+const C = list => "incategory:" + list.split("|").map(x => x.trim().replace(/ /g, "_")).join("|");
 const SECTIONS = [
   ["True crime", {
-    serial:   {label:"Serial killers", q:['hastemplate:"Infobox serial killer"','incategory:American_serial_killers|English_serial_killers|German_serial_killers|Russian_serial_killers|Canadian_serial_killers|Australian_serial_killers|South_African_serial_killers|Colombian_serial_killers|Japanese_serial_killers|French_serial_killers']},
-    captive:  {label:"Held captive", q:['"held captive" kidnapping convicted','"held captive" years rescued','incategory:Kidnappings_in_the_United_States|Kidnappings_in_England']},
-    family:   {label:"Family murders", q:['familicide','"family annihilator"','"murdered his wife and" children convicted','"killed her children" convicted']},
-    medical:  {label:"Medical killers", q:['incategory:Medical_serial_killers','"serial killer" nurse patients convicted','doctor murdered patients convicted']},
-    pairs:    {label:"Killer couples", q:['incategory:Serial_killer_duos','"killer couple"','"serial killer couple"']},
-    cold:     {label:"Cold cases cracked", q:['"genetic genealogy" murder arrested','"cold case" DNA murder convicted decades']},
-    web:      {label:"Online & dark web", q:['murder "dark web" convicted','murder livestreamed','murder "met online" convicted']},
-    unsolved: {label:"Unsolved murders", q:['incategory:Unsolved_murders_in_the_United_States|Unsolved_murders_in_England|Unsolved_murders_in_Canada|Unsolved_murders_in_Australia|Unsolved_murders_in_Germany','unsolved murder mystery']}
+    serial:   {label:"Serial killers", q:['hastemplate:"Infobox serial killer"', C("American serial killers|English serial killers|German serial killers|Russian serial killers|Canadian serial killers|Australian serial killers|South African serial killers|Colombian serial killers|Japanese serial killers|French serial killers")]},
+    captive:  {label:"Held captive", q:[C("Kidnapped American children|Formerly missing American people|Formerly missing Austrian people|Formerly missing people|1990s kidnappings in the United States|2000s kidnappings in the United States|2010s kidnappings in the United States"), C("Kidnappings in the United States|Kidnappings in England|Kidnappings in Canada|Kidnappings in Australia")]},
+    family:   {label:"Family murders", q:[C("Familicides in the United States|Familicides in England|Familicides in Australia|Familicides in Canada|Familicides|Child filicides in the United States|Perpetrators of filicide|Uxoricides in the United States|Parricides")]},
+    medical:  {label:"Medical killers", q:[C("Medical serial killers|Medical doctors convicted of murdering their patients|Nurses convicted of killing patients|Medical scandals in the United Kingdom")]},
+    pairs:    {label:"Killer couples", q:[C("Serial killer duos"), '"killer couple" hastemplate:"Infobox criminal"']},
+    cold:     {label:"Cold cases cracked", q:[C("People convicted using DNA evidence"), 'hastemplate:"Infobox serial killer" "genetic genealogy"', '"genetic genealogy" "cold case" murder hastemplate:"Infobox criminal"']},
+    web:      {label:"Online & dark web", q:['murder "met online" hastemplate:"Infobox criminal"', 'murder "dark web" hastemplate:"Infobox criminal"', C("Filmed killings in North America|Filmed killings in Europe")]},
+    unsolved: {label:"Unsolved murders", q:[C("Unsolved murders in the United States|Unsolved murders in England|Unsolved murders in Canada|Unsolved murders in Australia|Unsolved murders in Colorado|Unsolved murders in California|Unidentified American criminals|Unidentified serial killers")]}
   }],
   ["The unexplained", {
-    unexplained:{label:"Strange deaths & vanishings", q:['incategory:Unexplained_disappearances|Unsolved_deaths|Missing_person_cases_in_the_United_States','mysterious death unexplained circumstances']},
-    ufo:      {label:"UFOs & aliens", q:['incategory:UFO_sightings|UFO_sightings_in_the_United_States|Alien_abduction','UFO incident sighting witnesses','alien abduction claim']},
-    haunted:  {label:"Hauntings & exorcisms", q:['poltergeist case','exorcism death trial','incategory:Reportedly_haunted_locations_in_the_United_States|Reportedly_haunted_locations_in_England']},
-    hysteria: {label:"Mass hysteria & panics", q:['"mass hysteria"','"mass psychogenic illness"','"moral panic"']},
-    signals:  {label:"Eerie signals & broadcasts", q:['"broadcast signal intrusion"','unexplained radio signal','"numbers station"']}
+    unexplained:{label:"Strange deaths & vanishings", q:[C("Unsolved deaths in the United States|Unsolved deaths in Russia|Unsolved deaths in Alaska|Death conspiracy theories|Unsolved deaths|1990s missing person cases|2000s missing person cases|2010s missing person cases|Missing person cases in California")]},
+    ufo:      {label:"UFOs & aliens", q:[C("UFO sightings in the United States|UFO sightings|Alleged extraterrestrial encounters|UFO crashes|Aviation incidents involving UFOs and military aircraft|Alien abduction reports|Alien abductions"), 'UFO incident sighting witnesses']},
+    haunted:  {label:"Hauntings & exorcisms", q:[C("Poltergeists|Exorcised people|Paranormal hoaxes|English ghosts|Demonic possession"), C("Reportedly haunted locations in California|Reportedly haunted locations in New York (state)|Reportedly haunted locations in Texas|Reportedly haunted locations in Kentucky|Reportedly haunted locations in Philadelphia|Reportedly haunted locations in London|Reportedly haunted locations in Scotland|Reportedly haunted locations in Ohio|Reportedly haunted locations in Pennsylvania|Reportedly haunted locations in England")]},
+    hysteria: {label:"Mass hysteria & panics", q:[C("Mass psychogenic illness|Mass psychogenic illness in Europe|Satanic ritual abuse hysteria|Witch trials|Witch trials in the United States|Day care sex abuse hysteria")]},
+    signals:  {label:"Eerie signals & broadcasts", q:[C("Numbers stations|Pirate television|Broadcast signal intrusions|Unidentified radio signals"), '"broadcast signal intrusion"']}
   }],
   ["Air, sea & space", {
     air:      {label:"Air disasters", q:['hastemplate:"Infobox aircraft occurrence"','hastemplate:"Infobox aircraft occurrence" crash fatalities']},
-    ships:    {label:"Shipwrecks", q:['sinking "lives were lost"','ferry disaster capsized','shipwreck sank passengers drowned']},
-    subs:     {label:"Submarines & submersibles", q:['submarine disaster crew lost','submersible implosion','submarine sank all hands']},
-    diving:   {label:"Deep sea & diving", q:['"cave diving" death','"saturation diving" accident','diving accident divers died','freediving death']},
-    space:    {label:"Space disasters", q:['incategory:Spaceflight_accidents_and_incidents|Space_accidents_and_incidents','spacecraft disaster crew killed']}
+    ships:    {label:"Shipwrecks", q:[C("Ferry boat disasters|Maritime incidents involving engineering failures|Passenger ships lost at sea|Shipwrecks in the Yellow Sea"), 'shipwreck sank passengers drowned', 'ferry disaster capsized']},
+    subs:     {label:"Submarines & submersibles", q:[C("Submarines lost with all hands|Submarine accidents|Russian submarine accidents|United States submarine accidents|Submarine disasters")]},
+    diving:   {label:"Deep sea & diving", q:[C("Underwater diving deaths|Commercial diving accidents|Decompression accidents and incidents|Diving accidents|Free-diving deaths")]},
+    space:    {label:"Space disasters", q:[C("Space program fatalities|Space Shuttle disasters|Space accidents and incidents in the United States|Space accidents and incidents in the Soviet Union|Space accidents and incidents in Russia")]}
   }],
   ["Extreme nature", {
-    mountains:{label:"Mountains & climbing", q:['incategory:Mountaineering_disasters|Mountaineering_deaths','mountaineering disaster climbers died']},
-    caves:    {label:"Caves & mines", q:['incategory:Mining_disasters|Caving_incidents','mine disaster miners killed','cave rescue trapped']},
-    lost:     {label:"Lost in the wild", q:['lost wilderness survived days rescued','expedition disappeared perished','stranded survived rescued']},
-    animals:  {label:"Animal attacks", q:['incategory:Deaths_due_to_animal_attacks|Deaths_due_to_shark_attacks|Deaths_due_to_bear_attacks','fatal animal attack','man-eating']},
-    natural:  {label:"Natural disasters", q:['hastemplate:"Infobox earthquake"','volcanic eruption killed','avalanche disaster killed','tsunami killed']}
+    mountains:{label:"Mountains & climbing", q:[C("Mountaineering disasters|Deaths on Mount Everest|Deaths on K2|Mountaineering deaths in Nepal|Mountaineering deaths in Pakistan"), C("Mountaineering disasters|Mountaineering deaths")]},
+    caves:    {label:"Caves & mines", q:[C("Mining rescues|Coal mining disasters in West Virginia|Coal mining disasters in the United States|Coal mining disasters in England|Coal mining disasters in Wales|Caving incidents and rescues|Mining disasters in Chile|Mining disasters in China"), 'mine disaster miners killed']},
+    lost:     {label:"Lost in the wild", q:[C("Accidental deaths in Alaska|Unsolved deaths in Alaska|Missing person cases in Alaska|Deaths from hypothermia|Missing person cases in national parks"), C("Mountaineering disasters|Caving incidents and rescues|Incidents of cannibalism")]},
+    animals:  {label:"Animal attacks", q:[C("Deaths due to animal attacks in the United States|Deaths due to shark attacks|Deaths due to bear attacks in the United States|Shark attacks in the United States|Man-eaters|Deaths due to animal attacks in India|Deaths due to crocodile attacks|Deaths due to tiger attacks")]},
+    natural:  {label:"Natural disasters", q:['hastemplate:"Infobox earthquake"', C("Lahars|Avalanches in the United States|Tsunamis|Tsunamis in Japan|20th-century volcanic events|Deadliest earthquakes")]}
   }],
   ["Science & industry", {
-    nuclear:  {label:"Nuclear & radiation", q:['incategory:Nuclear_accidents_and_incidents|Radiation_accidents_and_incidents|Civilian_nuclear_power_accidents','radiation exposure accident deaths']},
-    industrial:{label:"Industrial disasters", q:['incategory:Industrial_disasters|Building_collapses|Explosions_in_the_United_States','industrial disaster explosion killed','chemical leak disaster']},
-    experiments:{label:"Medical experiments", q:['incategory:Unethical_human_experimentation|Human_subject_research_in_the_United_States','unethical human experimentation']},
-    outbreaks:{label:"Outbreaks & poisonings", q:['incategory:Mass_poisonings|Disease_outbreaks','outbreak deaths epidemic','mass poisoning']}
+    nuclear:  {label:"Nuclear & radiation", q:[C("Civilian nuclear power accidents|Radiation accidents and incidents|INES Level 7 accidents|Nuclear accidents and incidents|Military nuclear accidents|Criticality accidents and incidents")]},
+    industrial:{label:"Industrial disasters", q:[C("Industrial fires and explosions in the United States|Chemical disasters|Man-made disasters in the Soviet Union|Building collapses in the United States|Dam failures|Bridge disasters in the United States"), 'industrial disaster explosion killed']},
+    experiments:{label:"Medical experiments", q:[C("Human subject research in the United States|Japanese human subject research|Medical experimentation on prisoners of war|Medical scandals in the United States|Medical scandals in the United Kingdom|Nazi human subject research")]},
+    outbreaks:{label:"Outbreaks & poisonings", q:[C("Mass poisonings|Health disasters in the United States|Health disasters in India|Chemical disasters|Food poisoning incidents|Water contamination")]}
   }],
   ["Dark history", {
-    cults:    {label:"Cults", q:['incategory:Cults','cult leader followers deaths','cult "mass suicide"']},
-    survival: {label:"Survival horror", q:['"survival cannibalism"','survivors stranded rescued disaster','trapped survived days']},
-    inspired: {label:"Behind horror films", q:['"inspired the film" murder','"inspired the horror film"','murder "inspired the novel"']},
-    places:   {label:"Dark places", q:['incategory:Reportedly_haunted_locations_in_the_United_States|Reportedly_haunted_locations_in_England|Psychiatric_hospitals_in_the_United_States','abandoned asylum history','massacre site memorial']}
+    cults:    {label:"Cults", q:[C("Mass suicides|Peoples Temple"), 'cult leader followers deaths']},
+    survival: {label:"Survival horror", q:[C("Incidents of cannibalism|Mining rescues|Caving incidents and rescues|Shipwreck survivors"), '"survival cannibalism"']},
+    inspired: {label:"Behind horror films", q:['hastemplate:"Infobox serial killer" "horror film"', 'hastemplate:"Infobox criminal" "horror film"', 'hastemplate:"Infobox civilian attack" "horror film"']},
+    places:   {label:"Dark places", q:[C("Defunct prisons in Pennsylvania|Prison museums in the United States|Tuberculosis sanatoria in the United States|Defunct psychiatric hospitals in the United States|Reportedly haunted locations in Kentucky|Ghost towns in South America|Abandoned buildings and structures"), 'massacre site memorial']}
   }]
 ];
 const CATS = {any:{label:"Surprise me"}};
@@ -287,6 +289,9 @@ if(!Array.isArray(state.filters.eras)) state.filters.eras = state.filters.era ==
 delete state.filters.era;
 state.filters.eras = state.filters.eras.filter(k => ERAS.some(e => e.k === k));
 const BLOCK = /dahmer|\bgein\b|^list of|^lists of|\(disambiguation\)|^timeline of|^outline of|^index of|^history of|^category:/i;
+const BLOCK_DATE = /^(\d{4}|deaths in|(january|february|march|april|may|june|july|august|september|october|november|december) \d{4})\b|^\d{4}( in |s in | deaths)/i;
+// Skip entertainment, fiction and other pages that aren't real stories.
+const NOT_A_STORY = /\b(television|tv series|sitcom|film|novel|video game|album|song|band|franchise|comic|episode|season \d|musical|play by|book series|board game|website|podcast|wrestler|footballer|baseball|basketball|cricketer|rapper|singer|actor|actress)\b/i;
 const SKIP_SECTIONS = /^(references|notes|external links|further reading|see also|bibliography|sources|citations|footnotes|works cited|explanatory notes|notes and references|in popular culture|filmography|gallery)$/i;
 if(!CATS[state.filters.cat]) state.filters.cat = "any";
 let busy = false, drawerOpen = false;
@@ -350,11 +355,11 @@ async function batch(){
     const catKey = state.filters.cat === "any" ? pickOne(SURPRISE) : state.filters.cat;
     const cat = CATS[catKey];
     for(const q of shuffle(cat.q)){
-      const pool = (await searchPool(q)).filter(r => !BLOCK.test(r.title) && !isSeen(r.title) && r.size >= 9000);
+      const pool = (await searchPool(q)).filter(r => !BLOCK.test(r.title) && !BLOCK_DATE.test(r.title) && !isSeen(r.title) && r.size >= 9000);
       if(!pool.length) continue;
       const words = Object.fromEntries(pool.map(r => [r.title, r.wordcount]));
       const top = shuffle(pool.sort((a,b) => b.size - a.size).slice(0, 30)).slice(0, 20).map(r => r.title);
-      let items = (await details(top)).filter(d => !BLOCK.test(d.title) && !isSeen(d.title));
+      let items = (await details(top)).filter(d => !BLOCK.test(d.title) && !isSeen(d.title) && !NOT_A_STORY.test(d.desc));
       items = items.filter(d => eraOK(d.extract));
       if(items.length) return shuffle(items).map(d => Object.assign(d, {cat:cat.label, words:words[d.title] || 0}));
     }
@@ -402,8 +407,14 @@ function present(c){
 }
 // Cross-fade between stories where the browser supports view transitions.
 function transition(fn){
-  if(document.startViewTransition && !reduce() && !document.hidden){ try{ document.startViewTransition(fn); return; }catch(e){} }
-  fn();
+  let done = false;
+  const run = () => { if(done) return; done = true; fn(); };
+  if(document.startViewTransition && !reduce() && !document.hidden){
+    try{ document.startViewTransition(run); }catch(e){}
+    setTimeout(run, 350); // never leave the screen blank if the browser skips the animation
+    return;
+  }
+  run();
 }
 
 async function findStory(){
