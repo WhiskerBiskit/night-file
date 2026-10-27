@@ -37,7 +37,9 @@ img{max-width:100%;height:auto}
 html{scroll-behavior:smooth}
 button,.btn,.chip,.more,a{transition:background-color .3s var(--ease),border-color .3s var(--ease),color .3s var(--ease),transform .18s var(--ease),opacity .3s var(--ease)}
 button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.38s;animation-timing-function:var(--ease)}
+#file{transition:opacity .18s var(--ease),transform .18s var(--ease)}
+#file.swap-out{opacity:0;transform:translateY(6px) scale(.995)}
+#file.swap-in{animation:rise .45s var(--ease) both}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes drop{from{opacity:0;transform:translateY(-8px) scale(.99)}to{opacity:1;transform:none}}
 @keyframes lift{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:none}}
@@ -67,7 +69,7 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .drawer h4{margin:6px 0 0;font-family:var(--f-display);font-weight:500;font-size:17px;color:var(--lamp)}
 .drawer h4:first-child{margin-top:0}
 
-.file{background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 40px -24px #000;view-transition-name:casefile}
+.file{background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 40px -24px #000}
 .file .hero{width:100%;max-height:300px;object-fit:cover;display:block;background:var(--deep);filter:saturate(.85) sepia(.12);opacity:0;transform:scale(1.03);transition:opacity .7s var(--ease),transform 1.2s var(--ease)}
 .file .hero.loaded{opacity:1;transform:none}
 .file .body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px}
@@ -393,28 +395,30 @@ function showCard(c){
   hero.classList.remove("loaded");
   if(c.thumb){ hero.onload = () => hero.classList.add("loaded"); hero.src = c.thumb; hero.alt = c.title; hero.hidden = false; if(hero.complete && hero.naturalWidth) hero.classList.add("loaded"); }
   else { hero.removeAttribute("src"); hero.hidden = true; }
-  el("read").hidden = false;
+  el("read").hidden = openingTitle === c.title;
 }
 
-function clearArticle(){ stopListen(); el("article").innerHTML = ""; el("toc").hidden = true; el("credit").hidden = true; el("after").hidden = true; el("player").hidden = true; }
+let openingTitle = "";
+function clearArticle(){ openingTitle = ""; stopListen(); el("article").innerHTML = ""; el("toc").hidden = true; el("credit").hidden = true; el("after").hidden = true; el("player").hidden = true; }
 
 function present(c){
   state.current = c;
   if(!isSeen(c.title)) state.seen.push(c.title);
   state.seen = state.seen.slice(-400);
   save();
-  transition(() => { setWait(""); setMsg(""); clearArticle(); showCard(c); renderLib(); });
+  setWait(""); setMsg(""); clearArticle();
+  transition(() => { showCard(c); renderLib(); });
 }
-// Cross-fade between stories where the browser supports view transitions.
+// Fade the case file out and back in when the story changes (plain CSS, so it can never get stuck).
 function transition(fn){
-  let done = false;
-  const run = () => { if(done) return; done = true; fn(); };
-  if(document.startViewTransition && !reduce() && !document.hidden){
-    try{ document.startViewTransition(run); }catch(e){}
-    setTimeout(run, 350); // never leave the screen blank if the browser skips the animation
-    return;
-  }
-  run();
+  const f = el("file");
+  if(reduce()){ fn(); return; }
+  f.classList.add("swap-out");
+  setTimeout(() => {
+    fn();
+    f.classList.remove("swap-out");
+    f.classList.remove("swap-in"); void f.offsetWidth; f.classList.add("swap-in");
+  }, 180);
 }
 
 async function findStory(){
@@ -607,6 +611,7 @@ let openToken = 0;
 async function openArticle(title, restore){
   const token = ++openToken;
   clearArticle();
+  openingTitle = title;
   el("read").hidden = true;
   setMsg(""); setWait("Opening the full article…");
   try{
