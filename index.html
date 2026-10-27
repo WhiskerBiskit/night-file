@@ -39,9 +39,9 @@ img{max-width:100%;height:auto}
 html{scroll-behavior:smooth}
 button,.btn,.chip,.more,a{transition:background-color .3s var(--ease),border-color .3s var(--ease),color .3s var(--ease),transform .18s var(--ease),opacity .3s var(--ease)}
 button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
-#file{transition:opacity .18s var(--ease),transform .18s var(--ease)}
-#file.swap-out{opacity:0;transform:translateY(6px) scale(.995)}
-#file.swap-in{animation:rise .45s var(--ease) both}
+#file{transition:opacity .25s var(--ease),transform .25s var(--ease)}
+#file.swap-out{opacity:0;transform:translateY(8px) scale(.99)}
+#file.swap-in{animation:rise .55s var(--ease) both}
 @keyframes rise{from{opacity:.35;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes drop{from{opacity:0;transform:translateY(-8px) scale(.99)}to{opacity:1;transform:none}}
 @keyframes lift{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:none}}
@@ -62,6 +62,7 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .iconbtn{width:42px;height:42px;padding:0;justify-content:center;font-size:18px;letter-spacing:0;border-radius:50%}
 .menu{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:240px;display:flex;flex-direction:column;gap:2px;padding:8px;
   background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule);border-radius:8px;box-shadow:0 20px 40px -16px #000;animation:drop .25s var(--ease) both;transform-origin:top right;text-transform:none;letter-spacing:0}
+.menu.closing{animation:drop .18s var(--ease) reverse both}
 .menu .item{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:11px 12px;border-radius:5px;font-family:var(--f-mono);font-size:13px;color:var(--paper)}
 .menu .item:hover,.menu .item:focus-visible{background:color-mix(in srgb,var(--lamp) 14%,transparent);outline:none}
 .menu .item span{color:var(--soft);font-size:12px}
@@ -87,12 +88,13 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .more:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 /* Slide-up pickers (bottom sheets) */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.scrim{position:fixed;inset:0;z-index:40;background:rgba(3,6,4,.62);animation:fadeIn .25s var(--ease) both;transition:opacity .25s var(--ease)}
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(3,6,4,.62);animation:fadeIn .3s var(--ease) both;transition:opacity .3s var(--ease)}
 .scrim.off{opacity:0}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;margin:0 auto;max-width:680px;max-height:86vh;display:flex;flex-direction:column;
   background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule-hi);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -24px 60px -12px #000;
-  padding-bottom:env(safe-area-inset-bottom,0px);transform:translateY(0);transition:transform .34s var(--ease);touch-action:pan-y}
-.sheet.off{transform:translateY(105%)}
+  padding-bottom:env(safe-area-inset-bottom,0px);transform:translateY(0);transition:transform .46s cubic-bezier(.16,1,.3,1);touch-action:pan-y}
+.sheet.off{transform:translateY(105%);transition:transform .3s cubic-bezier(.55,0,.75,.1)}
+.sheet.entering .sheetBody > *{animation:rise .45s var(--ease) both;animation-delay:calc(var(--i,0) * 32ms + 80ms)}
 .sheet .grabzone{padding:10px 0 4px;cursor:grab;touch-action:none}
 .sheet .grab{width:42px;height:4px;border-radius:4px;background:var(--rule-hi);margin:0 auto}
 .sheet .sh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 20px 12px;border-bottom:1px solid var(--rule);touch-action:none}
@@ -105,7 +107,11 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .srow.sec{font-family:var(--f-mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--lamp);padding:16px 20px}
 .srow .chev{font-size:13px;color:var(--lamp);transition:transform .3s var(--ease)}
 .srow.sec[aria-expanded="true"] .chev{transform:rotate(90deg)}
-.sub{background:color-mix(in srgb,var(--ink) 45%,transparent);animation:drop .25s var(--ease) both}
+.subwrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ease)}
+.subwrap.open{grid-template-rows:1fr}
+.sub{overflow:hidden;min-height:0;background:color-mix(in srgb,var(--ink) 45%,transparent)}
+.sub .srow{opacity:0;transform:translateY(-6px);transition:opacity .25s var(--ease),transform .3s var(--ease),background-color .2s}
+.subwrap.open .sub .srow{opacity:1;transform:none;transition-delay:calc(var(--i,0) * 28ms + 60ms)}
 .sub .srow{padding-left:34px;font-size:17px}
 .srow[role="checkbox"][aria-checked="true"]{color:var(--lamp)}
 .srow[role="radio"][aria-checked="true"]{color:var(--lamp)}
@@ -114,9 +120,14 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
   background:color-mix(in srgb,var(--lamp) 9%,transparent);transition:background-color .25s var(--ease),border-color .25s var(--ease)}
 .box{flex:none;width:22px;height:22px;display:grid;place-items:center;font-size:14px;font-weight:700;line-height:1;color:#22180b;transition:background-color .2s,border-color .2s}
 .box{border-radius:5px;border:1.5px solid var(--rule-hi);position:relative}
-.srow[aria-checked="true"] .box::before,.srow[aria-checked="true"] .box::after{content:"";position:absolute;left:50%;top:50%;width:13px;height:2.4px;border-radius:2px;background:#22180b}
-.srow[aria-checked="true"] .box::before{transform:translate(-50%,-50%) rotate(45deg)}
-.srow[aria-checked="true"] .box::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.box::before,.box::after{content:"";position:absolute;left:50%;top:50%;width:13px;height:2.4px;border-radius:2px;background:#22180b;opacity:0;transition:opacity .18s var(--ease),transform .28s cubic-bezier(.34,1.56,.64,1)}
+.box::before{transform:translate(-50%,-50%) rotate(45deg) scale(.2)}
+.box::after{transform:translate(-50%,-50%) rotate(-45deg) scale(.2)}
+.srow[aria-checked="true"] .box::before{opacity:1;transform:translate(-50%,-50%) rotate(45deg) scale(1)}
+.srow[aria-checked="true"] .box::after{opacity:1;transform:translate(-50%,-50%) rotate(-45deg) scale(1)}
+.srow,.srow .box{transition:color .25s var(--ease),background-color .25s var(--ease),border-color .25s var(--ease)}
+.go span{display:inline-block;transition:opacity .16s var(--ease)}
+.go span.fading{opacity:0}
 .srow[aria-checked="true"] .box{background:var(--lamp);border-color:var(--lamp)}
 .sheetFoot{padding:12px 20px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--rule)}
 .sheetFoot .note{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--soft)}
@@ -144,7 +155,7 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,7vw,40px);l
 .strip img{height:100%;width:auto;max-width:170px;object-fit:cover;display:block;opacity:0;transition:opacity .5s var(--ease)}
 .strip img.loaded{opacity:1}
 .lightbox{position:fixed;inset:0;z-index:50;background:rgba(5,10,7,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-  padding:calc(56px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));animation:rise .3s var(--ease) both}
+  padding:calc(56px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .lightbox img{max-width:100%;max-height:72vh;object-fit:contain;border-radius:3px;box-shadow:0 20px 60px -20px #000}
 .lightbox p{margin:0;max-width:60ch;text-align:center;font-size:15px;color:var(--soft);line-height:1.45}
 .lightbox .lbnav{display:flex;gap:10px;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--soft)}
@@ -152,7 +163,8 @@ h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,7vw,40px);l
 #article img{cursor:zoom-in}
 /* loading placeholders: a shimmering outline of the card, so nothing jumps */
 .sk{background:linear-gradient(90deg,var(--folder) 0%,var(--folder-hi) 50%,var(--folder) 100%);background-size:200% 100%;animation:shimmer 1.6s linear infinite;border-radius:4px}
-.skel{display:flex;flex-direction:column}
+.skel{display:flex;flex-direction:column;animation:fadeIn .35s var(--ease) both}
+.artwait{animation:fadeIn .3s var(--ease) both}
 .skel .sk-hero{height:clamp(170px,50vw,300px);border-radius:0}
 .skel .sk-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px}
 .sk-line{height:14px}
@@ -593,7 +605,7 @@ function transition(fn){
     fn();
     f.classList.remove("swap-out");
     f.classList.remove("swap-in"); void f.offsetWidth; f.classList.add("swap-in");
-  }, 180);
+  }, 250);
 }
 
 // Quietly line up the next stories (and their photos) so "Different story" is instant.
@@ -659,7 +671,7 @@ async function loadPhotos(c){
     const img = document.createElement("img"); img.alt = p.cap || ""; img.loading = "lazy";
     img.onload = () => img.classList.add("loaded"); img.onerror = () => b.remove();
     img.src = p.thumb; b.append(img);
-    b.addEventListener("click", () => openLightbox(gallery.indexOf(p)));
+    b.addEventListener("click", () => openLightbox(gallery.indexOf(p), null, b));
     strip.append(b);
   });
   strip.hidden = false;
@@ -675,15 +687,35 @@ function showLb(){
   el("lbNav").hidden = lbList.length < 2;
   el("lbCount").textContent = (lbIndex + 1) + " / " + lbList.length;
 }
-function openLightbox(i, list){
+let lbFrom = null;
+function lbOrigin(){
+  const img = el("lbImg"), r = img.getBoundingClientRect();
+  if(!lbFrom || !lbFrom.isConnected || !r.width) return "50% 50%";
+  const f = lbFrom.getBoundingClientRect();
+  return (f.left + f.width / 2 - r.left) + "px " + (f.top + f.height / 2 - r.top) + "px";
+}
+function openLightbox(i, list, from){
   lbList = list || gallery; lbIndex = Math.max(0, i); if(!lbList.length) return;
+  lbFrom = from || null;
   showLb(); el("lightbox").hidden = false;
+  if(!reduce()){
+    el("lightbox").animate({opacity: [0, 1]}, {duration: 260, easing: "ease-out"});
+    const img = el("lbImg"); img.style.transformOrigin = lbOrigin();
+    img.animate({transform: ["scale(.35)", "scale(1)"], opacity: [0, 1]}, {duration: 380, easing: "cubic-bezier(.16,1,.3,1)"});
+  }
   try{ history.pushState({nfPhoto: 1}, ""); }catch(e){}
 }
 function closeLightbox(fromHistory){
-  if(el("lightbox").hidden) return;
-  el("lightbox").hidden = true; el("lbImg").removeAttribute("src");
+  const lb = el("lightbox");
+  if(lb.hidden || lb._closing) return;
+  const done = () => { lb._closing = false; lb.hidden = true; el("lbImg").removeAttribute("src"); };
   if(!fromHistory && history.state && history.state.nfPhoto){ ignorePop = true; history.back(); }
+  if(reduce()){ done(); return; }
+  lb._closing = true;
+  const img = el("lbImg"); img.style.transformOrigin = lbOrigin();
+  img.animate({transform: ["scale(1)", "scale(.35)"], opacity: [1, 0]}, {duration: 260, easing: "cubic-bezier(.55,0,.75,.1)", fill: "forwards"});
+  const a = lb.animate({opacity: [1, 0]}, {duration: 280, easing: "ease-in", fill: "forwards"});
+  a.onfinish = () => { done(); a.cancel(); img.getAnimations().forEach(x => x.cancel()); };
 }
 el("lbClose").addEventListener("click", () => closeLightbox());
 el("lightbox").addEventListener("click", ev => { if(ev.target === el("lightbox")) closeLightbox(); });
@@ -703,7 +735,7 @@ el("lightbox").addEventListener("touchend", ev => {
   const dx = ev.changedTouches[0].clientX - lbX; lbX = null;
   if(Math.abs(dx) > 50) (dx < 0 ? el("lbNext") : el("lbPrev")).click();
 }, {passive:true});
-el("heroBox").addEventListener("click", () => { if(gallery.length) openLightbox(0); else if(state.current && state.current.thumb) openLightbox(0, [{thumb: state.current.thumb, big: sized(state.current.thumb, 960), cap: ""}]); });
+el("heroBox").addEventListener("click", () => { if(gallery.length) openLightbox(0, null, el("heroBox")); else if(state.current && state.current.thumb) openLightbox(0, [{thumb: state.current.thumb, big: sized(state.current.thumb, 960), cap: ""}], el("heroBox")); });
 
 // Older saved/recent entries may be missing a photo; look them up once.
 async function backfillThumbs(){
@@ -719,16 +751,21 @@ async function backfillThumbs(){
   }catch(e){}
 }
 
+// fade the current card out and the loading outline in (skipped if the story arrived first)
+function showLoading(){
+  if(el("card").hidden){ setWait("Digging through the archives…"); return; }
+  transition(() => { if(!busy) return; el("card").hidden = true; setWait("Digging through the archives…"); });
+}
 let findAgain = false;
 async function findStory(){
   if(busy){ findAgain = true; return; }   // filters changed while loading: run again when this one finishes
   findAgain = false;
   const startKey = qKey();
   let q = take();
-  if(!q && prefetchJob){ setBusy(true); el("card").hidden = true; clearArticle(); setWait("Digging through the archives…"); await prefetchJob; setBusy(false); q = take(); }
+  if(!q && prefetchJob){ setBusy(true); clearArticle(); showLoading(); await prefetchJob; setBusy(false); q = take(); }
   if(q){ present(q); setTimeout(prefetch, 1200); return; }
-  setBusy(true); setMsg(""); clearArticle(); el("card").hidden = true;
-  setWait("Digging through the archives…");
+  setBusy(true); setMsg(""); clearArticle();
+  showLoading();
   try{
     const items = await batch();
     setBusy(false); setWait("");
@@ -859,47 +896,75 @@ function srow(label, opts){
   }
   b.addEventListener("click", opts.onClick); return b;
 }
-function renderSheet(){
+function buildSheet(){
   const body = el("sheetBody"), foot = el("sheetFoot");
-  const keepScroll = body.scrollTop;
   body.innerHTML = ""; foot.innerHTML = ""; foot.hidden = true;
   if(sheetKind === "cat"){
     el("sheetTitle").textContent = "Choose a category";
     body.append(srow("Surprise me", {on: state.filters.cat === "any", current: state.filters.cat === "any", onClick: () => pickCat("any")}));
     SECTIONS.forEach(([name, group]) => {
       const open = openSection === name;
-      body.append(srow(name, {sec: true, open, current: state.filters.cat in group, onClick: () => { openSection = open ? null : name; renderSheet(); }}));
-      if(open){
-        const sub = document.createElement("div"); sub.className = "sub";
-        Object.keys(group).forEach(k => sub.append(srow(group[k].label, {on: state.filters.cat === k, onClick: () => pickCat(k)})));
-        body.append(sub);
-      }
+      const head = srow(name, {sec: true, open, current: state.filters.cat in group, onClick: () => toggleSection(name)});
+      head.dataset.section = name;
+      const wrap = document.createElement("div"); wrap.className = "subwrap" + (open ? " open" : ""); wrap.dataset.section = name;
+      const sub = document.createElement("div"); sub.className = "sub";
+      Object.keys(group).forEach((k, i) => { const r = srow(group[k].label, {on: state.filters.cat === k, onClick: () => pickCat(k)}); r.style.setProperty("--i", i); sub.append(r); });
+      wrap.append(sub); body.append(head, wrap);
     });
   }
   if(sheetKind === "era"){
     el("sheetTitle").textContent = "When did it happen?";
-    const sel = state.filters.eras;
-    body.append(srow("Any era", {box: true, on: !sel.length, onClick: () => { state.filters.eras = []; save(); renderFilters(); renderSheet(); }}));
-    ERAS.forEach(e => body.append(srow(e.label.replace("–", " – "), {box: true, on: sel.includes(e.k), onClick: () => {
-      const set = new Set(state.filters.eras); set.has(e.k) ? set.delete(e.k) : set.add(e.k);
-      state.filters.eras = ERAS.map(x => x.k).filter(x => set.has(x));
-      if(state.filters.eras.length === ERAS.length) state.filters.eras = [];
-      save(); renderFilters(); renderSheet();
-    }})));
+    const any = srow("Any era", {box: true, on: !state.filters.eras.length, onClick: () => { state.filters.eras = []; eraChanged(); }});
+    any.dataset.era = "any"; body.append(any);
+    ERAS.forEach(e => {
+      const r = srow(e.label.replace("–", " – "), {box: true, on: state.filters.eras.includes(e.k), onClick: () => {
+        const set = new Set(state.filters.eras); set.has(e.k) ? set.delete(e.k) : set.add(e.k);
+        state.filters.eras = ERAS.map(x => x.k).filter(x => set.has(x));
+        if(state.filters.eras.length === ERAS.length) state.filters.eras = [];
+        eraChanged();
+      }});
+      r.dataset.era = e.k; body.append(r);
+    });
     foot.hidden = false;
     const note = document.createElement("div"); note.className = "note"; note.textContent = "Quick picks";
     const quick = document.createElement("div"); quick.className = "quick";
     [["Modern", ["1990s","2010s"]], ["20th century", ["1900s","1950s"]], ["Old", ["pre1900"]]].forEach(([label, list]) => {
       const q = document.createElement("button"); q.type = "button"; q.textContent = label;
-      q.addEventListener("click", () => { state.filters.eras = list.slice(); save(); renderFilters(); renderSheet(); });
+      q.addEventListener("click", () => { state.filters.eras = list.slice(); eraChanged(); });
       quick.append(q);
     });
-    const go = document.createElement("button"); go.type = "button"; go.className = "primary go";
-    go.textContent = "Show stories · " + eraSummary();
+    const go = document.createElement("button"); go.type = "button"; go.className = "primary go"; go.id = "eraGo";
+    const span = document.createElement("span"); span.textContent = "Show stories · " + eraSummary(); go.append(span);
     go.addEventListener("click", () => closeSheet());
     foot.append(note, quick, go);
   }
-  body.scrollTop = keepScroll;
+  [...body.children].forEach((n, i) => n.style.setProperty("--i", Math.min(i, 12)));
+}
+// open one section at a time; they glide open and closed
+function toggleSection(name){
+  openSection = openSection === name ? null : name;
+  el("sheetBody").querySelectorAll(".srow.sec").forEach(h => h.setAttribute("aria-expanded", String(h.dataset.section === openSection)));
+  el("sheetBody").querySelectorAll(".subwrap").forEach(w => w.classList.toggle("open", w.dataset.section === openSection));
+  if(openSection) setTimeout(() => {
+    const w = el("sheetBody").querySelector('.subwrap.open');
+    if(w) w.scrollIntoView({block: "nearest", behavior: reduce() ? "auto" : "smooth"});
+  }, 420);
+}
+// tick boxes and the button label update in place (no redraw)
+function eraChanged(){
+  save(); renderFilters();
+  const sel = state.filters.eras;
+  el("sheetBody").querySelectorAll("[data-era]").forEach(r => {
+    const on = r.dataset.era === "any" ? !sel.length : sel.includes(r.dataset.era);
+    r.setAttribute("aria-checked", String(on));
+  });
+  const span = el("eraGo") && el("eraGo").querySelector("span");
+  if(span){
+    const text = "Show stories · " + eraSummary();
+    if(span.textContent === text) return;
+    span.classList.add("fading");
+    setTimeout(() => { span.textContent = text; span.classList.remove("fading"); }, reduce() ? 0 : 160);
+  }
 }
 function openSheet(kind){
   closeMenu();
@@ -907,32 +972,34 @@ function openSheet(kind){
   sheetKind = kind;
   if(kind === "era") erasBefore = state.filters.eras.join(",");
   if(kind === "cat"){ const sec = SECTIONS.find(([, g]) => state.filters.cat in g); openSection = sec ? sec[0] : null; }
-  renderSheet(); renderFilters();
+  buildSheet(); renderFilters();
   el("sheetBody").scrollTop = 0;
   const sh = el("sheet"), sc = el("scrim");
   sc.hidden = false; sc.classList.remove("off");
   sh.hidden = false; sh.style.transform = "";
+  sh.classList.add("entering");
   requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.remove("off")));
+  setTimeout(() => sh.classList.remove("entering"), 900);
   document.body.style.overflow = "hidden";
   try{ history.pushState({nfSheet: 1}, ""); }catch(e){}
-  setTimeout(() => { const first = el("sheetBody").querySelector('[aria-checked="true"]'); if(first) first.scrollIntoView({block: "nearest"}); }, 360);
+  setTimeout(() => { const first = el("sheetBody").querySelector('[aria-checked="true"]'); if(first) first.scrollIntoView({block: "nearest", behavior: reduce() ? "auto" : "smooth"}); }, 480);
 }
 function closeSheet(fromHistory){
   if(!sheetKind) return;
   const was = sheetKind; sheetKind = null;
   const sh = el("sheet"), sc = el("scrim");
-  sh.style.transform = ""; sh.classList.add("off"); sc.classList.add("off");
+  sh.style.transform = ""; sh.classList.remove("entering"); sh.classList.add("off"); sc.classList.add("off");
   document.body.style.overflow = "";
-  setTimeout(() => { if(!sheetKind){ sh.hidden = true; sc.hidden = true; } }, reduce() ? 0 : 340);
+  setTimeout(() => { if(!sheetKind){ sh.hidden = true; sc.hidden = true; } }, reduce() ? 0 : 320);
   renderFilters();
   if(!fromHistory && history.state && history.state.nfSheet){ ignorePop = true; history.back(); }
-  if(was === "era" && state.filters.eras.join(",") !== erasBefore) refilter();
+  if(was === "era" && state.filters.eras.join(",") !== erasBefore) setTimeout(refilter, reduce() ? 0 : 200);
 }
 function pickCat(k){
   const changed = state.filters.cat !== k;
   state.filters.cat = k; save();
   closeSheet();
-  if(changed) refilter(); else renderFilters();
+  if(changed) setTimeout(refilter, reduce() ? 0 : 200); else renderFilters();
 }
 el("catBtn").addEventListener("click", () => openSheet("cat"));
 el("eraBtn").addEventListener("click", () => openSheet("era"));
@@ -948,18 +1015,46 @@ el("scrim").addEventListener("click", () => closeSheet());
 })();
 
 /* ---------- ⋯ menu ---------- */
-function closeMenu(){ el("menu").hidden = true; el("menuBtn").setAttribute("aria-expanded", "false"); }
+function closeMenu(){
+  const m = el("menu"); el("menuBtn").setAttribute("aria-expanded", "false");
+  if(m.hidden || m.classList.contains("closing")) return;
+  if(reduce()){ m.hidden = true; return; }
+  m.classList.add("closing");
+  setTimeout(() => { m.classList.remove("closing"); m.hidden = true; }, 180);
+}
 el("menuBtn").addEventListener("click", ev => {
   ev.stopPropagation();
-  const open = el("menu").hidden;
+  const m = el("menu"), open = m.hidden || m.classList.contains("closing");
   if(open && sheetKind) closeSheet();
-  el("menu").hidden = !open; el("menuBtn").setAttribute("aria-expanded", String(open));
+  if(open){ m.classList.remove("closing"); m.hidden = false; el("menuBtn").setAttribute("aria-expanded", "true"); }
+  else closeMenu();
 });
 function jumpTo(id){
   closeMenu();
-  const d = el(id); d.open = true;
+  const d = el(id); if(!d.open) toggleDetails(d);
   d.scrollIntoView({behavior: reduce() ? "auto" : "smooth", block:"start"});
 }
+// Contents, Saved, Recent and the saved groups slide open and closed instead of popping
+function toggleDetails(d){
+  if(d._anim) d._anim.cancel();
+  if(reduce()){ d.open = !d.open; return; }
+  const start = d.offsetHeight;
+  const opening = !d.open;
+  d.open = true;
+  const full = d.offsetHeight;
+  const end = opening ? full : (d.open = false, d.offsetHeight);
+  d.open = true;
+  d.style.overflow = "hidden";
+  const anim = d.animate({height: [start + "px", end + "px"]}, {duration: opening ? 380 : 300, easing: "cubic-bezier(.22,.7,.2,1)"});
+  d._anim = anim;
+  anim.onfinish = anim.oncancel = () => { d._anim = null; d.style.overflow = ""; if(!opening) d.open = false; };
+}
+document.addEventListener("click", ev => {
+  const sum = ev.target.closest("details.toc > summary, details.fold > summary, .groups details > summary");
+  if(!sum) return;
+  ev.preventDefault();
+  toggleDetails(sum.parentElement);
+});
 el("toSaved").addEventListener("click", () => jumpTo("savedSec"));
 el("toRecent").addEventListener("click", () => jumpTo("lib"));
 el("toTop").addEventListener("click", () => { closeMenu(); window.scrollTo({top:0, behavior: reduce() ? "auto" : "smooth"}); });
@@ -1033,6 +1128,7 @@ async function openArticle(title, restore, y){
   openingTitle = title;
   el("read").hidden = true;
   setMsg(""); el("artWait").hidden = false;
+  requestAnimationFrame(() => el("artWait").scrollIntoView({behavior: reduce() ? "auto" : "smooth", block: "start"}));
   try{
     const r = await fetch(REST + encodeURIComponent(title.replace(/ /g, "_")) + "?redirect=true");
     if(!r.ok) throw new Error("status " + r.status);
@@ -1108,7 +1204,7 @@ el("article").addEventListener("click", ev => {
   if(im && !ev.target.closest("a[data-wiki]")){
     const imgs = [...el("article").querySelectorAll("img")];
     const list = imgs.map(x => { const f = x.closest("figure"); return {thumb: x.currentSrc || x.src, big: sized(x.currentSrc || x.src, 960), cap: f && f.querySelector("figcaption") ? f.querySelector("figcaption").textContent : ""}; });
-    ev.preventDefault(); openLightbox(imgs.indexOf(im), list); return;
+    ev.preventDefault(); openLightbox(imgs.indexOf(im), list, im); return;
   }
   const a = ev.target.closest("a[data-wiki]");
   if(!a) return;
