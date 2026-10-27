@@ -85,12 +85,38 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .chip[aria-pressed="true"]{border-color:var(--lamp);color:#22180b;background:var(--lamp);font-weight:500}
 .more{all:unset;cursor:pointer;font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;color:var(--lamp);padding:6px 4px}
 .more:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
-.panel{display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule);border-radius:8px;padding:14px;animation:drop .28s var(--ease) both;transform-origin:top;box-shadow:0 18px 40px -24px #000}
-.panel.closing{animation:drop .18s var(--ease) reverse both}
-.panel h4{margin:6px 0 0;font-family:var(--f-display);font-weight:500;font-size:17px;color:var(--lamp)}
-.panel h4:first-child{margin-top:0}
-.panel .hint{margin:0;font-size:15px;color:var(--soft)}
-.panel .done{align-self:flex-end;margin-top:4px}
+/* Slide-up pickers (bottom sheets) */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(3,6,4,.62);animation:fadeIn .25s var(--ease) both;transition:opacity .25s var(--ease)}
+.scrim.off{opacity:0}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;margin:0 auto;max-width:680px;max-height:86vh;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule-hi);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -24px 60px -12px #000;
+  padding-bottom:env(safe-area-inset-bottom,0px);transform:translateY(0);transition:transform .34s var(--ease);touch-action:pan-y}
+.sheet.off{transform:translateY(105%)}
+.sheet .grabzone{padding:10px 0 4px;cursor:grab;touch-action:none}
+.sheet .grab{width:42px;height:4px;border-radius:4px;background:var(--rule-hi);margin:0 auto}
+.sheet .sh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 20px 12px;border-bottom:1px solid var(--rule);touch-action:none}
+.sheet .sh b{font-family:var(--f-display);font-size:22px;font-weight:700;color:var(--paper)}
+.sheet .sh .more{font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.sheetBody{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.srow{all:unset;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;padding:13px 20px;cursor:pointer;
+  border-bottom:1px solid color-mix(in srgb,var(--rule) 60%,transparent);font-family:var(--f-body);font-size:18px;line-height:1.3;color:var(--paper)}
+.srow:hover,.srow:focus-visible{background:color-mix(in srgb,var(--lamp) 8%,transparent);outline:none}
+.srow.sec{font-family:var(--f-mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--lamp);padding:16px 20px}
+.srow .chev{font-size:13px;color:var(--lamp);transition:transform .3s var(--ease)}
+.srow.sec[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.sub{background:color-mix(in srgb,var(--ink) 45%,transparent);animation:drop .25s var(--ease) both}
+.sub .srow{padding-left:34px;font-size:17px}
+.srow[aria-checked="true"]{color:var(--lamp)}
+.check,.box{flex:none;width:22px;height:22px;display:grid;place-items:center;font-size:13px;color:#22180b;transition:background-color .2s,border-color .2s}
+.check{border-radius:50%}
+.box{border-radius:5px;border:1.5px solid var(--rule-hi)}
+.srow[aria-checked="true"] .check,.srow[aria-checked="true"] .box{background:var(--lamp);border-color:var(--lamp)}
+.sheetFoot{padding:12px 20px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--rule)}
+.sheetFoot .note{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--soft)}
+.sheetFoot .quick{display:flex;gap:8px;flex-wrap:wrap}
+.sheetFoot .quick button{padding:9px 12px;font-size:12px}
+.sheetFoot .go{justify-content:center;width:100%}
 
 .file{background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 40px -24px #000}
 .heroBox{height:clamp(170px,50vw,300px);overflow:hidden;background:linear-gradient(90deg,var(--deep),var(--folder),var(--deep));background-size:200% 100%;animation:shimmer 1.8s linear infinite}
@@ -249,11 +275,9 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
 
   <div class="filters" id="filters">
     <div class="bar">
-      <button class="sel" id="catBtn" type="button" aria-expanded="false" aria-controls="catPanel"><span class="k">Category</span><b id="catLabel"></b><span class="caret">▾</span></button>
-      <button class="sel" id="eraBtn" type="button" aria-expanded="false" aria-controls="eraPanel"><span class="k">Era</span><b id="eraLabel"></b><span class="caret">▾</span></button>
+      <button class="sel" id="catBtn" type="button" aria-expanded="false" aria-controls="sheet"><span class="k">Category</span><b id="catLabel"></b><span class="caret">▾</span></button>
+      <button class="sel" id="eraBtn" type="button" aria-expanded="false" aria-controls="sheet"><span class="k">Era</span><b id="eraLabel"></b><span class="caret">▾</span></button>
     </div>
-    <div class="panel" id="catPanel" hidden></div>
-    <div class="panel" id="eraPanel" hidden></div>
   </div>
 
   <section class="file" id="file" aria-live="polite">
@@ -308,6 +332,14 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
   <details class="list fold" id="lib" hidden><summary>Recent stories <span id="libCount"></span></summary><ul id="libList"></ul></details>
 </div>
 
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet off" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="grabzone" id="grab"><div class="grab"></div></div>
+  <div class="sh" id="sheetHead"><b id="sheetTitle"></b><button class="more" id="sheetClose" type="button">Close ✕</button></div>
+  <div class="sheetBody" id="sheetBody"></div>
+  <div class="sheetFoot" id="sheetFoot" hidden></div>
+</div>
+
 <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo">
   <button class="iconbtn lb-close" id="lbClose" type="button" aria-label="Close photo">✕</button>
   <img id="lbImg" alt="">
@@ -343,6 +375,13 @@ const SECTIONS = [
     pairs:    {label:"Killer couples", q:[C("Serial killer duos"), '"killer couple" hastemplate:"Infobox criminal"']},
     cold:     {label:"Cold cases cracked", q:[C("People convicted using DNA evidence"), 'hastemplate:"Infobox serial killer" "genetic genealogy"', '"genetic genealogy" "cold case" murder hastemplate:"Infobox criminal"']},
     web:      {label:"Online & dark web", q:['murder "met online" hastemplate:"Infobox criminal"', 'murder "dark web" hastemplate:"Infobox criminal"', C("Filmed killings in North America|Filmed killings in Europe")]},
+    spree:    {label:"Spree & mass killings", q:[C("Spree shootings in the United States|Spree shootings in Australia|Spree shootings in Norway|Spree shootings in Germany|Spree shootings in the United Kingdom|Spree shootings in Canada|School massacres in the United States|Massacres in Australia|Mass murders in Colorado|Mass shootings in schools")]},
+    female:   {label:"Female killers", q:[C("American female serial killers|English female serial killers|German female serial killers|Female serial killers|Executed female serial killers|American female murderers|Executed American women|Female criminal duos|Perpetrators of mariticide")]},
+    kids:     {label:"Kids who killed", q:[C("Murder committed by minors|Murder committed by children|Minors convicted of murder|Juvenile offenders sentenced to life imprisonment")]},
+    cannibal: {label:"Cannibal killers", q:[C("German cannibals|Japanese cannibals|American cannibals|Russian cannibals|Cannibalism in North America|Cannibalism in Europe|Incidents of cannibalism")]},
+    wrong:    {label:"Wrongly convicted", q:[C("False confessions|People exonerated by DNA evidence|Exonerated death row inmates|Wrongful convictions"), 'murder "wrongfully convicted" exonerated hastemplate:"Infobox criminal"']},
+    prison:   {label:"Prison breaks & riots", q:[C("Prison riots in the United States|Prison uprisings|Prison massacres|Escapes and escape attempts from Alcatraz|Prison escapes|Escapees from United States detention")]},
+    mob:      {label:"Mob & cartel violence", q:[C("American Mafia events|Organized crime conflicts in the United States|Murdered American gangsters|Mexican drug war|Organized crime events in Mexico|Murdered Mafiosi")]},
     unsolved: {label:"Unsolved murders", q:[C("Unsolved murders in the United States|Unsolved murders in England|Unsolved murders in Canada|Unsolved murders in Australia|Unsolved murders in Colorado|Unsolved murders in California|Unidentified American criminals|Unidentified serial killers")]}
   }],
   ["The unexplained", {
@@ -350,14 +389,20 @@ const SECTIONS = [
     ufo:      {label:"UFOs & aliens", q:[C("UFO sightings in the United States|UFO sightings|Alleged extraterrestrial encounters|UFO crashes|Aviation incidents involving UFOs and military aircraft|Alien abduction reports|Alien abductions"), 'UFO incident sighting witnesses']},
     haunted:  {label:"Hauntings & exorcisms", q:[C("Poltergeists|Paranormal hoaxes|English ghosts"), C("Reportedly haunted locations in California|Reportedly haunted locations in New York (state)|Reportedly haunted locations in Texas|Reportedly haunted locations in Kentucky|Reportedly haunted locations in Philadelphia|Reportedly haunted locations in London|Reportedly haunted locations in Scotland|Reportedly haunted locations in Ohio|Reportedly haunted locations in Pennsylvania|Reportedly haunted locations in England")]},
     hysteria: {label:"Mass hysteria & panics", q:[C("Mass psychogenic illness|Mass psychogenic illness in Europe|Satanic ritual abuse hysteria|Witch trials|Witch trials in the United States|Day care sex abuse hysteria")]},
-    signals:  {label:"Eerie signals & broadcasts", q:[C("Numbers stations|Pirate television|Broadcast signal intrusions|Unidentified radio signals")]}
+    signals:  {label:"Eerie signals & broadcasts", q:[C("Numbers stations|Pirate television|Broadcast signal intrusions|Unidentified radio signals")]},
+    ghost:    {label:"Ghost ships", q:[C("Ghost ships|Mass disappearances|Missing ships|Ships lost with all hands")]},
+    unidentified:{label:"Unidentified bodies", q:[C("Unidentified decedents|Unidentified murder victims|Unidentified murder victims in the United States|Formerly unidentified decedents")]},
+    internet: {label:"Internet mysteries", q:[C("Internet mysteries|Suicide and the Internet|Internet challenges|Death conspiracy theories|2010s viral videos")]}
   }],
-  ["Air, sea & space", {
+  ["Disasters", {
     air:      {label:"Air disasters", q:['hastemplate:"Infobox aircraft occurrence"','hastemplate:"Infobox aircraft occurrence" crash fatalities']},
     ships:    {label:"Shipwrecks", q:[C("Ferry boat disasters|Maritime incidents involving engineering failures|Passenger ships lost at sea|Shipwrecks in the Yellow Sea"), 'shipwreck sank passengers drowned', 'ferry disaster capsized']},
     subs:     {label:"Submarines & submersibles", q:[C("Submarines lost with all hands|Submarine accidents|Russian submarine accidents|United States submarine accidents|Submarine disasters")]},
     diving:   {label:"Deep sea & diving", q:[C("Underwater diving deaths|Commercial diving accidents|Decompression accidents and incidents|Diving accidents|Free-diving deaths")]},
-    space:    {label:"Space disasters", q:[C("Space program fatalities|Space Shuttle disasters|Space accidents and incidents in the United States|Space accidents and incidents in the Soviet Union|Space accidents and incidents in Russia")]}
+    space:    {label:"Space disasters", q:[C("Space program fatalities|Space Shuttle disasters|Space accidents and incidents in the United States|Space accidents and incidents in the Soviet Union|Space accidents and incidents in Russia")]},
+    trains:   {label:"Train disasters", q:[C("Railway accidents and incidents in the United States|Railway accidents and incidents in the United Kingdom|Railway accidents and incidents in Canada|Derailments in Germany|Runaway train disasters|Train collisions in Scotland|Train and rapid transit fires in the United Kingdom|Railway accidents and incidents in India")]},
+    fires:    {label:"Deadly fires", q:[C("Nightclub fires in the United States|Theatre fires in the United States|High-rise fires|Fire disasters involving barricaded escape routes|Building and structure fires in London|Nightclub fires started by pyrotechnics|Hotel fires in the United States|Residential building fires in the United Kingdom")]},
+    crush:    {label:"Crowd crushes & stampedes", q:[C("Crowd collapses and crushes in stadiums|Crowd collapses and crushes in the United Kingdom|Crowd collapses and crushes in Asia|Crowd collapses and crushes in North America|Human stampedes in the United States|Human stampedes in India|Concert disasters")]}
   }],
   ["Extreme nature", {
     mountains:{label:"Mountains & climbing", q:[C("Mountaineering disasters|Deaths on Mount Everest|Deaths on K2|Mountaineering deaths in Nepal|Mountaineering deaths in Pakistan"), C("Mountaineering disasters|Mountaineering deaths")]},
@@ -376,6 +421,8 @@ const SECTIONS = [
     cults:    {label:"Cults", q:[C("Mass suicides|Peoples Temple"), 'cult leader followers deaths']},
     survival: {label:"Survival horror", q:[C("Incidents of cannibalism|Mining rescues|Caving incidents and rescues"), '"survival cannibalism"']},
     inspired: {label:"Behind horror films", q:['hastemplate:"Infobox serial killer" "horror film"', 'hastemplate:"Infobox criminal" "horror film"', 'hastemplate:"Infobox civilian attack" "horror film"']},
+    executions:{label:"Botched executions", q:[C("Botched executions in the United States|Execution survivors in the United States|Botched executions")]},
+    graves:   {label:"Grave robbers & body snatchers", q:[C("Body snatchers|Body snatching|Grave robbers|Desecration of graves|Resurrectionists")]},
     places:   {label:"Dark places", q:[C("Defunct prisons in Pennsylvania|Prison museums in the United States|Tuberculosis sanatoria in the United States|Defunct psychiatric hospitals in the United States|Reportedly haunted locations in Kentucky|Ghost towns in South America|Abandoned buildings and structures"), 'massacre site memorial']}
   }]
 ];
@@ -396,7 +443,7 @@ state.filters.eras = state.filters.eras.filter(k => ERAS.some(e => e.k === k));
 const BLOCK = /dahmer|\bgein\b|^list of|^lists of|\(disambiguation\)|^timeline of|^outline of|^index of|^history of|^category:/i;
 const BLOCK_DATE = /^(\d{4}|deaths in|(january|february|march|april|may|june|july|august|september|october|november|december) \d{4})\b|^\d{4}( in |s in | deaths)/i;
 // Skip entertainment, fiction and other pages that aren't real stories.
-const NOT_A_STORY = /\b(television|tv series|sitcom|film|novel|video game|album|song|band|franchise|comic|manga|anime|episode|season \d|musical|play by|book series|board game|website|podcast|wrestler|footballer|baseball|basketball|cricketer|rapper|singer|actor|actress|poet|politician|prime minister|king of|queen of|emperor|pharaoh|saint|disciple|ruler|tribe|atoll|lake in|city in|village in|neighborhood in|company|telescope|satellite|cometary|power plant|power station|closed city|icebreaker|stratovolcano|volcanic cone|volcano in|large volcano|active volcano|highest mountain|mountain in|physicist|herpetologist|athlete|businessman)\b/i;
+const NOT_A_STORY = /\b(television|tv series|sitcom|film|novel|video game|album|song|band|franchise|comic|manga|anime|episode|season \d|musical|play by|book series|board game|website|podcast|wrestler|footballer|baseball|basketball|cricketer|rapper|singer|actor|actress|poet|politician|prime minister|king of|queen of|emperor|pharaoh|saint|disciple|ruler|tribe|atoll|lake in|city in|village in|neighborhood in|company|telescope|satellite|cometary|power plant|power station|closed city|icebreaker|stratovolcano|volcanic cone|volcano in|large volcano|active volcano|highest mountain|mountain in|physicist|herpetologist|athlete|businessman|boxer|comedian|organization|nonprofit|laboratory|monument|revolutionary)\b/i;
 const SKIP_SECTIONS = /^(references|notes|external links|further reading|see also|bibliography|sources|citations|footnotes|works cited|explanatory notes|notes and references|in popular culture|filmography|gallery)$/i;
 if(!CATS[state.filters.cat]) state.filters.cat = "any";
 let busy = false;
@@ -626,7 +673,7 @@ function openLightbox(i, list){
 function closeLightbox(fromHistory){
   if(el("lightbox").hidden) return;
   el("lightbox").hidden = true; el("lbImg").removeAttribute("src");
-  if(!fromHistory && history.state && history.state.nfPhoto) history.back();
+  if(!fromHistory && history.state && history.state.nfPhoto){ ignorePop = true; history.back(); }
 }
 el("lbClose").addEventListener("click", () => closeLightbox());
 el("lightbox").addEventListener("click", ev => { if(ev.target === el("lightbox")) closeLightbox(); });
@@ -771,10 +818,10 @@ function renderSaved(){
   el("toSaved").hidden = state.saved.length === 0;
 }
 
-/* ---------- filters: two drop-downs ---------- */
-let panel = null, erasBefore = "";
-function eraSummary(){
-  const sel = state.filters.eras;
+/* ---------- filters: slide-up pickers ---------- */
+let sheetKind = null, erasBefore = "", openSection = null;
+function eraSummary(list){
+  const sel = list || state.filters.eras;
   if(!sel.length) return "Any era";
   const idx = sel.map(k => ERAS.findIndex(e => e.k === k)).sort((a, b) => a - b);
   const contiguous = idx.every((v, i) => i === 0 || v === idx[i - 1] + 1);
@@ -785,82 +832,113 @@ function eraSummary(){
   return a.min + "–" + (b.max === 9999 ? "now" : b.max);
 }
 function refilter(){ state.queue = {key:"", items:[]}; save(); renderFilters(); findStory(); }
-function openPanel(which){
-  if(panel === which){ closePanel(); return; }
-  if(panel) closePanel(true);
-  closeMenu();
-  panel = which;
-  if(which === "era") erasBefore = state.filters.eras.join(",");
-  renderFilters();
-}
-function closePanel(instant){
-  if(!panel) return;
-  const was = panel, p = el(was === "cat" ? "catPanel" : "eraPanel");
-  const finish = () => {
-    p.classList.remove("closing"); p.hidden = true;
-    if(panel === was) panel = null;
-    renderFilters();
-    if(was === "era" && state.filters.eras.join(",") !== erasBefore) refilter();
-  };
-  if(instant || reduce()){ finish(); return; }
-  p.classList.add("closing"); setTimeout(finish, 170);
-}
-function chip(label, pressed, onClick){
-  const b = document.createElement("button"); b.type = "button"; b.className = "chip";
-  b.textContent = label; b.setAttribute("aria-pressed", String(pressed));
-  b.addEventListener("click", onClick); return b;
-}
 function renderFilters(){
   el("catLabel").textContent = CATS[state.filters.cat].label;
   el("eraLabel").textContent = eraSummary();
-  el("catBtn").setAttribute("aria-expanded", String(panel === "cat"));
-  el("eraBtn").setAttribute("aria-expanded", String(panel === "era"));
-  const cp = el("catPanel"), ep = el("eraPanel");
-  cp.hidden = panel !== "cat"; ep.hidden = panel !== "era";
-  if(panel === "cat"){
-    cp.innerHTML = "";
-    const top = document.createElement("div"); top.className = "frow";
-    top.append(chip("Surprise me", state.filters.cat === "any", () => pickCat("any")));
-    cp.append(top);
+  el("catBtn").setAttribute("aria-expanded", String(sheetKind === "cat"));
+  el("eraBtn").setAttribute("aria-expanded", String(sheetKind === "era"));
+}
+function srow(label, opts){
+  const b = document.createElement("button"); b.type = "button"; b.className = "srow" + (opts.sec ? " sec" : "");
+  const t = document.createElement("span"); t.textContent = label; b.append(t);
+  if(opts.sec){ b.setAttribute("aria-expanded", String(!!opts.open)); const c = document.createElement("span"); c.className = "chev"; c.textContent = "▸"; b.append(c); }
+  else { b.setAttribute("role", opts.box ? "checkbox" : "radio"); b.setAttribute("aria-checked", String(!!opts.on)); const m = document.createElement("span"); m.className = opts.box ? "box" : "check"; m.textContent = opts.on ? "✓" : ""; b.append(m); }
+  b.addEventListener("click", opts.onClick); return b;
+}
+function renderSheet(){
+  const body = el("sheetBody"), foot = el("sheetFoot");
+  const keepScroll = body.scrollTop;
+  body.innerHTML = ""; foot.innerHTML = ""; foot.hidden = true;
+  if(sheetKind === "cat"){
+    el("sheetTitle").textContent = "Choose a category";
+    body.append(srow("Surprise me", {on: state.filters.cat === "any", onClick: () => pickCat("any")}));
     SECTIONS.forEach(([name, group]) => {
-      const h = document.createElement("h4"); h.textContent = name;
-      const row = document.createElement("div"); row.className = "frow";
-      Object.keys(group).forEach(k => row.append(chip(group[k].label, state.filters.cat === k, () => pickCat(k))));
-      cp.append(h, row);
+      const open = openSection === name;
+      body.append(srow(name, {sec: true, open, onClick: () => { openSection = open ? null : name; renderSheet(); }}));
+      if(open){
+        const sub = document.createElement("div"); sub.className = "sub";
+        Object.keys(group).forEach(k => sub.append(srow(group[k].label, {on: state.filters.cat === k, onClick: () => pickCat(k)})));
+        body.append(sub);
+      }
     });
   }
-  if(panel === "era"){
-    ep.innerHTML = "";
-    const hint = document.createElement("p"); hint.className = "hint"; hint.textContent = "Pick one or more.";
-    const row = document.createElement("div"); row.className = "frow";
+  if(sheetKind === "era"){
+    el("sheetTitle").textContent = "When did it happen?";
     const sel = state.filters.eras;
-    row.append(chip("Any era", !sel.length, () => { state.filters.eras = []; save(); renderFilters(); }));
-    ERAS.forEach(e => row.append(chip(e.label, sel.includes(e.k), () => {
+    body.append(srow("Any era", {box: true, on: !sel.length, onClick: () => { state.filters.eras = []; save(); renderFilters(); renderSheet(); }}));
+    ERAS.forEach(e => body.append(srow(e.label.replace("–", " – "), {box: true, on: sel.includes(e.k), onClick: () => {
       const set = new Set(state.filters.eras); set.has(e.k) ? set.delete(e.k) : set.add(e.k);
       state.filters.eras = ERAS.map(x => x.k).filter(x => set.has(x));
       if(state.filters.eras.length === ERAS.length) state.filters.eras = [];
-      save(); renderFilters();
-    })));
-    const done = document.createElement("button"); done.type = "button"; done.className = "primary small done"; done.textContent = "Done";
-    done.addEventListener("click", () => closePanel());
-    ep.append(hint, row, done);
+      save(); renderFilters(); renderSheet();
+    }})));
+    foot.hidden = false;
+    const note = document.createElement("div"); note.className = "note"; note.textContent = "Quick picks";
+    const quick = document.createElement("div"); quick.className = "quick";
+    [["Modern", ["1990s","2010s"]], ["20th century", ["1900s","1950s"]], ["Old", ["pre1900"]]].forEach(([label, list]) => {
+      const q = document.createElement("button"); q.type = "button"; q.textContent = label;
+      q.addEventListener("click", () => { state.filters.eras = list.slice(); save(); renderFilters(); renderSheet(); });
+      quick.append(q);
+    });
+    const go = document.createElement("button"); go.type = "button"; go.className = "primary go";
+    go.textContent = "Show stories · " + eraSummary();
+    go.addEventListener("click", () => closeSheet());
+    foot.append(note, quick, go);
   }
+  body.scrollTop = keepScroll;
+}
+function openSheet(kind){
+  closeMenu();
+  if(sheetKind === kind) return;
+  sheetKind = kind;
+  if(kind === "era") erasBefore = state.filters.eras.join(",");
+  if(kind === "cat"){ const sec = SECTIONS.find(([, g]) => state.filters.cat in g); openSection = sec ? sec[0] : null; }
+  renderSheet(); renderFilters();
+  el("sheetBody").scrollTop = 0;
+  const sh = el("sheet"), sc = el("scrim");
+  sc.hidden = false; sc.classList.remove("off");
+  sh.hidden = false; sh.style.transform = "";
+  requestAnimationFrame(() => requestAnimationFrame(() => sh.classList.remove("off")));
+  document.body.style.overflow = "hidden";
+  try{ history.pushState({nfSheet: 1}, ""); }catch(e){}
+  setTimeout(() => { const first = el("sheetBody").querySelector('[aria-checked="true"]'); if(first) first.scrollIntoView({block: "nearest"}); }, 360);
+}
+function closeSheet(fromHistory){
+  if(!sheetKind) return;
+  const was = sheetKind; sheetKind = null;
+  const sh = el("sheet"), sc = el("scrim");
+  sh.style.transform = ""; sh.classList.add("off"); sc.classList.add("off");
+  document.body.style.overflow = "";
+  setTimeout(() => { if(!sheetKind){ sh.hidden = true; sc.hidden = true; } }, reduce() ? 0 : 340);
+  renderFilters();
+  if(!fromHistory && history.state && history.state.nfSheet){ ignorePop = true; history.back(); }
+  if(was === "era" && state.filters.eras.join(",") !== erasBefore) refilter();
 }
 function pickCat(k){
   const changed = state.filters.cat !== k;
   state.filters.cat = k; save();
-  closePanel();
-  if(changed) refilter();
+  closeSheet();
+  if(changed) refilter(); else renderFilters();
 }
-el("catBtn").addEventListener("click", () => openPanel("cat"));
-el("eraBtn").addEventListener("click", () => openPanel("era"));
+el("catBtn").addEventListener("click", () => openSheet("cat"));
+el("eraBtn").addEventListener("click", () => openSheet("era"));
+el("sheetClose").addEventListener("click", () => closeSheet());
+el("scrim").addEventListener("click", () => closeSheet());
+// drag the sheet down to close it
+(() => {
+  let y0 = null, dy = 0;
+  const start = ev => { y0 = ev.touches[0].clientY; dy = 0; el("sheet").style.transition = "none"; };
+  const move = ev => { if(y0 === null) return; dy = Math.max(0, ev.touches[0].clientY - y0); el("sheet").style.transform = "translateY(" + dy + "px)"; };
+  const end = () => { if(y0 === null) return; y0 = null; el("sheet").style.transition = ""; if(dy > 90) closeSheet(); else el("sheet").style.transform = ""; };
+  [el("grab"), el("sheetHead")].forEach(z => { z.addEventListener("touchstart", start, {passive:true}); z.addEventListener("touchmove", move, {passive:true}); z.addEventListener("touchend", end); });
+})();
 
 /* ---------- ⋯ menu ---------- */
 function closeMenu(){ el("menu").hidden = true; el("menuBtn").setAttribute("aria-expanded", "false"); }
 el("menuBtn").addEventListener("click", ev => {
   ev.stopPropagation();
   const open = el("menu").hidden;
-  if(open && panel) closePanel(true);
+  if(open && sheetKind) closeSheet();
   el("menu").hidden = !open; el("menuBtn").setAttribute("aria-expanded", String(open));
 });
 function jumpTo(id){
@@ -875,9 +953,8 @@ el("toTop").addEventListener("click", () => { closeMenu(); window.scrollTo({top:
 document.addEventListener("click", ev => {
   const path = ev.composedPath();
   if(!el("menu").hidden && !path.includes(el("menu").parentNode)) closeMenu();
-  if(panel && !path.includes(el("filters"))) closePanel();
 });
-document.addEventListener("keydown", ev => { if(ev.key === "Escape"){ closeMenu(); closePanel(); } });
+document.addEventListener("keydown", ev => { if(ev.key === "Escape"){ closeMenu(); closeSheet(); } });
 
 /* ---------- full article ---------- */
 const DROP = "script,style,link,meta,iframe,object,embed,noscript,audio,video,sup.reference,sup.mw-ref,.mw-ref,.reference,.mw-editsection,.navbox,.navbox-styles,.vertical-navbox,.sidebar,.metadata,.ambox,.ombox,.tmbox,.cmbox,.hatnote,.dablink,.shortdescription,.sistersitebox,.side-box,.mw-empty-elt,.noprint,.reflist,.refbegin,.mw-references-wrap,ol.references,.portalbox,.authority-control,.mbox-small,.coordinates,.geo-nondefault,.mw-kartographer-maplink,.box-More_citations_needed,.module-shortcutboxplain,link[rel=mw-deduplicated-inline-style]";
@@ -1051,7 +1128,9 @@ el("back").addEventListener("click", () => {
   // use the browser history so the phone's back gesture stays in step
   if(history.state && history.state.nfBack) history.back(); else goBack();
 });
-addEventListener("popstate", () => { if(!el("lightbox").hidden){ closeLightbox(true); return; } if(backStack.length) goBack(); });
+// our own history.back() calls (closing a sheet or photo) should not count as "go back a story"
+let ignorePop = false;
+addEventListener("popstate", () => { if(ignorePop){ ignorePop = false; return; } if(sheetKind){ closeSheet(true); return; } if(!el("lightbox").hidden){ closeLightbox(true); return; } if(backStack.length) goBack(); });
 
 // remember reading position
 let progT = 0;
