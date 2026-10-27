@@ -107,11 +107,15 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .srow.sec[aria-expanded="true"] .chev{transform:rotate(90deg)}
 .sub{background:color-mix(in srgb,var(--ink) 45%,transparent);animation:drop .25s var(--ease) both}
 .sub .srow{padding-left:34px;font-size:17px}
-.srow[aria-checked="true"]{color:var(--lamp)}
-.check,.box{flex:none;width:22px;height:22px;display:grid;place-items:center;font-size:13px;color:#22180b;transition:background-color .2s,border-color .2s}
-.check{border-radius:50%}
-.box{border-radius:5px;border:1.5px solid var(--rule-hi)}
-.srow[aria-checked="true"] .check,.srow[aria-checked="true"] .box{background:var(--lamp);border-color:var(--lamp)}
+.srow[role="checkbox"][aria-checked="true"]{color:var(--lamp)}
+.srow .lbl{border-radius:999px;transition:background-color .25s var(--ease),color .25s var(--ease),padding .25s var(--ease)}
+.srow[role="radio"][aria-checked="true"] .lbl{background:linear-gradient(180deg,#e0b450,var(--lamp));color:#22180b;padding:5px 16px;margin:-5px 0 -5px -16px;font-weight:500;box-shadow:0 4px 14px -6px rgba(212,166,64,.6)}
+.box{flex:none;width:22px;height:22px;display:grid;place-items:center;font-size:14px;font-weight:700;line-height:1;color:#22180b;transition:background-color .2s,border-color .2s}
+.box{border-radius:5px;border:1.5px solid var(--rule-hi);position:relative}
+.srow[aria-checked="true"] .box::before,.srow[aria-checked="true"] .box::after{content:"";position:absolute;left:50%;top:50%;width:13px;height:2.4px;border-radius:2px;background:#22180b}
+.srow[aria-checked="true"] .box::before{transform:translate(-50%,-50%) rotate(45deg)}
+.srow[aria-checked="true"] .box::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.srow[aria-checked="true"] .box{background:var(--lamp);border-color:var(--lamp)}
 .sheetFoot{padding:12px 20px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--rule)}
 .sheetFoot .note{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--soft)}
 .sheetFoot .quick{display:flex;gap:8px;flex-wrap:wrap}
@@ -368,20 +372,15 @@ const norm = s => String(s||"").trim().toLowerCase();
 const C = list => "incategory:" + list.split("|").map(x => x.trim().replace(/ /g, "_")).join("|");
 const SECTIONS = [
   ["True crime", {
-    serial:   {label:"Serial killers", q:['hastemplate:"Infobox serial killer"', C("American serial killers|English serial killers|German serial killers|Russian serial killers|Canadian serial killers|Australian serial killers|South African serial killers|Colombian serial killers|Japanese serial killers|French serial killers")]},
-    captive:  {label:"Held captive", q:[C("Kidnapped American children|Formerly missing American people|Formerly missing Austrian people|Formerly missing people|1990s kidnappings in the United States|2000s kidnappings in the United States|2010s kidnappings in the United States"), C("Kidnappings in the United States|Kidnappings in England|Kidnappings in Canada|Kidnappings in Australia")]},
-    family:   {label:"Family murders", q:[C("Familicides in the United States|Familicides in England|Familicides in Australia|Familicides in Canada|Familicides|Child filicides in the United States|Perpetrators of filicide|Uxoricides in the United States|Parricides")]},
-    medical:  {label:"Medical killers", q:[C("Medical serial killers|Medical doctors convicted of murdering their patients|Nurses convicted of killing patients|Medical scandals in the United Kingdom")]},
-    pairs:    {label:"Killer couples", q:[C("Serial killer duos"), '"killer couple" hastemplate:"Infobox criminal"']},
-    cold:     {label:"Cold cases cracked", q:[C("People convicted using DNA evidence"), 'hastemplate:"Infobox serial killer" "genetic genealogy"', '"genetic genealogy" "cold case" murder hastemplate:"Infobox criminal"']},
-    web:      {label:"Online & dark web", q:['murder "met online" hastemplate:"Infobox criminal"', 'murder "dark web" hastemplate:"Infobox criminal"', C("Filmed killings in North America|Filmed killings in Europe")]},
+    serial:   {label:"Serial killers", q:['hastemplate:"Infobox serial killer"', C("American serial killers|English serial killers|German serial killers|Russian serial killers|Canadian serial killers|Australian serial killers|South African serial killers|Colombian serial killers|Japanese serial killers|French serial killers"), C("Serial killer duos"), '"killer couple" hastemplate:"Infobox criminal"']},
+    female:   {label:"Female killers & angels of death", q:[C("American female serial killers|English female serial killers|German female serial killers|Female serial killers|Executed female serial killers|American female murderers|Executed American women|Female criminal duos|Perpetrators of mariticide"), C("Medical serial killers|Medical doctors convicted of murdering their patients|Nurses convicted of killing patients|Medical scandals in the United Kingdom")]},
     spree:    {label:"Spree & mass killings", q:[C("Spree shootings in the United States|Spree shootings in Australia|Spree shootings in Norway|Spree shootings in Germany|Spree shootings in the United Kingdom|Spree shootings in Canada|School massacres in the United States|Massacres in Australia|Mass murders in Colorado|Mass shootings in schools")]},
-    female:   {label:"Female killers", q:[C("American female serial killers|English female serial killers|German female serial killers|Female serial killers|Executed female serial killers|American female murderers|Executed American women|Female criminal duos|Perpetrators of mariticide")]},
-    kids:     {label:"Kids who killed", q:[C("Murder committed by minors|Murder committed by children|Minors convicted of murder|Juvenile offenders sentenced to life imprisonment")]},
+    family:   {label:"Family murders & killer kids", q:[C("Familicides in the United States|Familicides in England|Familicides in Australia|Familicides in Canada|Familicides|Child filicides in the United States|Perpetrators of filicide|Uxoricides in the United States|Parricides"), C("Murder committed by minors|Murder committed by children|Minors convicted of murder|Juvenile offenders sentenced to life imprisonment")]},
+    captive:  {label:"Kidnapped & held captive", q:[C("Kidnapped American children|Formerly missing American people|Formerly missing Austrian people|Formerly missing people|1990s kidnappings in the United States|2000s kidnappings in the United States|2010s kidnappings in the United States"), C("Kidnappings in the United States|Kidnappings in England|Kidnappings in Canada|Kidnappings in Australia")]},
     cannibal: {label:"Cannibal killers", q:[C("German cannibals|Japanese cannibals|American cannibals|Russian cannibals|Cannibalism in North America|Cannibalism in Europe|Incidents of cannibalism")]},
-    wrong:    {label:"Wrongly convicted", q:[C("False confessions|People exonerated by DNA evidence|Exonerated death row inmates|Wrongful convictions"), 'murder "wrongfully convicted" exonerated hastemplate:"Infobox criminal"']},
-    prison:   {label:"Prison breaks & riots", q:[C("Prison riots in the United States|Prison uprisings|Prison massacres|Escapes and escape attempts from Alcatraz|Prison escapes|Escapees from United States detention")]},
-    mob:      {label:"Mob & cartel violence", q:[C("American Mafia events|Organized crime conflicts in the United States|Murdered American gangsters|Mexican drug war|Organized crime events in Mexico|Murdered Mafiosi")]},
+    cold:     {label:"Cold cases & wrongful convictions", q:[C("People convicted using DNA evidence"), 'hastemplate:"Infobox serial killer" "genetic genealogy"', '"genetic genealogy" "cold case" murder hastemplate:"Infobox criminal"', C("False confessions|People exonerated by DNA evidence|Exonerated death row inmates|Wrongful convictions"), 'murder "wrongfully convicted" exonerated hastemplate:"Infobox criminal"']},
+    mob:      {label:"Mobs, cartels & prisons", q:[C("American Mafia events|Organized crime conflicts in the United States|Murdered American gangsters|Mexican drug war|Organized crime events in Mexico|Murdered Mafiosi"), C("Prison riots in the United States|Prison uprisings|Prison massacres|Escapes and escape attempts from Alcatraz|Prison escapes|Escapees from United States detention")]},
+    web:      {label:"Online & dark web", q:['murder "met online" hastemplate:"Infobox criminal"', 'murder "dark web" hastemplate:"Infobox criminal"', C("Filmed killings in North America|Filmed killings in Europe")]},
     unsolved: {label:"Unsolved murders", q:[C("Unsolved murders in the United States|Unsolved murders in England|Unsolved murders in Canada|Unsolved murders in Australia|Unsolved murders in Colorado|Unsolved murders in California|Unidentified American criminals|Unidentified serial killers")]}
   }],
   ["The unexplained", {
@@ -445,6 +444,15 @@ const BLOCK_DATE = /^(\d{4}|deaths in|(january|february|march|april|may|june|jul
 // Skip entertainment, fiction and other pages that aren't real stories.
 const NOT_A_STORY = /\b(television|tv series|sitcom|film|novel|video game|album|song|band|franchise|comic|manga|anime|episode|season \d|musical|play by|book series|board game|website|podcast|wrestler|footballer|baseball|basketball|cricketer|rapper|singer|actor|actress|poet|politician|prime minister|king of|queen of|emperor|pharaoh|saint|disciple|ruler|tribe|atoll|lake in|city in|village in|neighborhood in|company|telescope|satellite|cometary|power plant|power station|closed city|icebreaker|stratovolcano|volcanic cone|volcano in|large volcano|active volcano|highest mountain|mountain in|physicist|herpetologist|athlete|businessman|boxer|comedian|organization|nonprofit|laboratory|monument|revolutionary)\b/i;
 const SKIP_SECTIONS = /^(references|notes|external links|further reading|see also|bibliography|sources|citations|footnotes|works cited|explanatory notes|notes and references|in popular culture|filmography|gallery)$/i;
+// merged categories: carry old picks and saved stories over to their new homes
+const MERGED_KEYS = {pairs:"serial", medical:"female", kids:"family", wrong:"cold", prison:"mob"};
+const MERGED_LABELS = {"Killer couples":"Serial killers", "Medical killers":"Female killers & angels of death", "Female killers":"Female killers & angels of death",
+  "Family murders":"Family murders & killer kids", "Kids who killed":"Family murders & killer kids", "Held captive":"Kidnapped & held captive",
+  "Cold cases cracked":"Cold cases & wrongful convictions", "Wrongly convicted":"Cold cases & wrongful convictions",
+  "Mob & cartel violence":"Mobs, cartels & prisons", "Prison breaks & riots":"Mobs, cartels & prisons", "Air, sea & space":"Disasters"};
+if(MERGED_KEYS[state.filters.cat]) state.filters.cat = MERGED_KEYS[state.filters.cat];
+["saved","library"].forEach(list => (state[list] || []).forEach(c => { if(MERGED_LABELS[c.cat]) c.cat = MERGED_LABELS[c.cat]; }));
+if(state.queue && state.queue.key && MERGED_KEYS[state.queue.key.split("|")[0]]) state.queue = {key:"", items:[]};
 if(!CATS[state.filters.cat]) state.filters.cat = "any";
 let busy = false;
 
@@ -840,9 +848,13 @@ function renderFilters(){
 }
 function srow(label, opts){
   const b = document.createElement("button"); b.type = "button"; b.className = "srow" + (opts.sec ? " sec" : "");
-  const t = document.createElement("span"); t.textContent = label; b.append(t);
+  const t = document.createElement("span"); t.className = "lbl"; t.textContent = label; b.append(t);
   if(opts.sec){ b.setAttribute("aria-expanded", String(!!opts.open)); const c = document.createElement("span"); c.className = "chev"; c.textContent = "▸"; b.append(c); }
-  else { b.setAttribute("role", opts.box ? "checkbox" : "radio"); b.setAttribute("aria-checked", String(!!opts.on)); const m = document.createElement("span"); m.className = opts.box ? "box" : "check"; m.textContent = opts.on ? "✓" : ""; b.append(m); }
+  else {
+    b.setAttribute("role", opts.box ? "checkbox" : "radio"); b.setAttribute("aria-checked", String(!!opts.on));
+    // eras get a box with a ✕; the chosen category gets a gold oval behind its name instead
+    if(opts.box){ const m = document.createElement("span"); m.className = "box";  b.append(m); }
+  }
   b.addEventListener("click", opts.onClick); return b;
 }
 function renderSheet(){
