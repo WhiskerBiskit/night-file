@@ -1,6 +1,6 @@
 // Night File service worker: keeps the app itself available offline.
 // Wikipedia requests always go to the network so stories stay current.
-const CACHE = "nightfile-v1";
+const CACHE = "nightfile-v2";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
