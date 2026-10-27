@@ -241,11 +241,11 @@ const SECTIONS = [
     unsolved: {label:"Unsolved murders", q:[C("Unsolved murders in the United States|Unsolved murders in England|Unsolved murders in Canada|Unsolved murders in Australia|Unsolved murders in Colorado|Unsolved murders in California|Unidentified American criminals|Unidentified serial killers")]}
   }],
   ["The unexplained", {
-    unexplained:{label:"Strange deaths & vanishings", q:[C("Unsolved deaths in the United States|Unsolved deaths in Russia|Unsolved deaths in Alaska|Death conspiracy theories|Unsolved deaths|1990s missing person cases|2000s missing person cases|2010s missing person cases|Missing person cases in California")]},
+    unexplained:{label:"Strange deaths & vanishings", q:[C("Unsolved deaths in the United States|Unsolved deaths in Russia|Unsolved deaths in Alaska|Death conspiracy theories|1990s missing person cases|2000s missing person cases|2010s missing person cases|Missing person cases in California")]},
     ufo:      {label:"UFOs & aliens", q:[C("UFO sightings in the United States|UFO sightings|Alleged extraterrestrial encounters|UFO crashes|Aviation incidents involving UFOs and military aircraft|Alien abduction reports|Alien abductions"), 'UFO incident sighting witnesses']},
-    haunted:  {label:"Hauntings & exorcisms", q:[C("Poltergeists|Exorcised people|Paranormal hoaxes|English ghosts|Demonic possession"), C("Reportedly haunted locations in California|Reportedly haunted locations in New York (state)|Reportedly haunted locations in Texas|Reportedly haunted locations in Kentucky|Reportedly haunted locations in Philadelphia|Reportedly haunted locations in London|Reportedly haunted locations in Scotland|Reportedly haunted locations in Ohio|Reportedly haunted locations in Pennsylvania|Reportedly haunted locations in England")]},
+    haunted:  {label:"Hauntings & exorcisms", q:[C("Poltergeists|Paranormal hoaxes|English ghosts"), C("Reportedly haunted locations in California|Reportedly haunted locations in New York (state)|Reportedly haunted locations in Texas|Reportedly haunted locations in Kentucky|Reportedly haunted locations in Philadelphia|Reportedly haunted locations in London|Reportedly haunted locations in Scotland|Reportedly haunted locations in Ohio|Reportedly haunted locations in Pennsylvania|Reportedly haunted locations in England")]},
     hysteria: {label:"Mass hysteria & panics", q:[C("Mass psychogenic illness|Mass psychogenic illness in Europe|Satanic ritual abuse hysteria|Witch trials|Witch trials in the United States|Day care sex abuse hysteria")]},
-    signals:  {label:"Eerie signals & broadcasts", q:[C("Numbers stations|Pirate television|Broadcast signal intrusions|Unidentified radio signals"), '"broadcast signal intrusion"']}
+    signals:  {label:"Eerie signals & broadcasts", q:[C("Numbers stations|Pirate television|Broadcast signal intrusions|Unidentified radio signals")]}
   }],
   ["Air, sea & space", {
     air:      {label:"Air disasters", q:['hastemplate:"Infobox aircraft occurrence"','hastemplate:"Infobox aircraft occurrence" crash fatalities']},
@@ -257,7 +257,7 @@ const SECTIONS = [
   ["Extreme nature", {
     mountains:{label:"Mountains & climbing", q:[C("Mountaineering disasters|Deaths on Mount Everest|Deaths on K2|Mountaineering deaths in Nepal|Mountaineering deaths in Pakistan"), C("Mountaineering disasters|Mountaineering deaths")]},
     caves:    {label:"Caves & mines", q:[C("Mining rescues|Coal mining disasters in West Virginia|Coal mining disasters in the United States|Coal mining disasters in England|Coal mining disasters in Wales|Caving incidents and rescues|Mining disasters in Chile|Mining disasters in China"), 'mine disaster miners killed']},
-    lost:     {label:"Lost in the wild", q:[C("Accidental deaths in Alaska|Unsolved deaths in Alaska|Missing person cases in Alaska|Deaths from hypothermia|Missing person cases in national parks"), C("Mountaineering disasters|Caving incidents and rescues|Incidents of cannibalism")]},
+    lost:     {label:"Lost in the wild", q:[C("Formerly missing people|Missing person cases in Alaska|Missing person cases in Australia|Unsolved deaths in Alaska|Accidental deaths in Alaska"), C("Mountaineering disasters|Caving incidents and rescues|Mining rescues")]},
     animals:  {label:"Animal attacks", q:[C("Deaths due to animal attacks in the United States|Deaths due to shark attacks|Deaths due to bear attacks in the United States|Shark attacks in the United States|Man-eaters|Deaths due to animal attacks in India|Deaths due to crocodile attacks|Deaths due to tiger attacks")]},
     natural:  {label:"Natural disasters", q:['hastemplate:"Infobox earthquake"', C("Lahars|Avalanches in the United States|Tsunamis|Tsunamis in Japan|20th-century volcanic events|Deadliest earthquakes")]}
   }],
@@ -269,7 +269,7 @@ const SECTIONS = [
   }],
   ["Dark history", {
     cults:    {label:"Cults", q:[C("Mass suicides|Peoples Temple"), 'cult leader followers deaths']},
-    survival: {label:"Survival horror", q:[C("Incidents of cannibalism|Mining rescues|Caving incidents and rescues|Shipwreck survivors"), '"survival cannibalism"']},
+    survival: {label:"Survival horror", q:[C("Incidents of cannibalism|Mining rescues|Caving incidents and rescues"), '"survival cannibalism"']},
     inspired: {label:"Behind horror films", q:['hastemplate:"Infobox serial killer" "horror film"', 'hastemplate:"Infobox criminal" "horror film"', 'hastemplate:"Infobox civilian attack" "horror film"']},
     places:   {label:"Dark places", q:[C("Defunct prisons in Pennsylvania|Prison museums in the United States|Tuberculosis sanatoria in the United States|Defunct psychiatric hospitals in the United States|Reportedly haunted locations in Kentucky|Ghost towns in South America|Abandoned buildings and structures"), 'massacre site memorial']}
   }]
@@ -291,7 +291,7 @@ state.filters.eras = state.filters.eras.filter(k => ERAS.some(e => e.k === k));
 const BLOCK = /dahmer|\bgein\b|^list of|^lists of|\(disambiguation\)|^timeline of|^outline of|^index of|^history of|^category:/i;
 const BLOCK_DATE = /^(\d{4}|deaths in|(january|february|march|april|may|june|july|august|september|october|november|december) \d{4})\b|^\d{4}( in |s in | deaths)/i;
 // Skip entertainment, fiction and other pages that aren't real stories.
-const NOT_A_STORY = /\b(television|tv series|sitcom|film|novel|video game|album|song|band|franchise|comic|episode|season \d|musical|play by|book series|board game|website|podcast|wrestler|footballer|baseball|basketball|cricketer|rapper|singer|actor|actress)\b/i;
+const NOT_A_STORY = /\b(television|tv series|sitcom|film|novel|video game|album|song|band|franchise|comic|manga|anime|episode|season \d|musical|play by|book series|board game|website|podcast|wrestler|footballer|baseball|basketball|cricketer|rapper|singer|actor|actress|poet|politician|prime minister|king of|queen of|emperor|pharaoh|saint|disciple|ruler|tribe|atoll|lake in|city in|village in|neighborhood in|company|telescope|satellite|cometary|power plant|power station|closed city|icebreaker|stratovolcano|volcanic cone|volcano in|large volcano|active volcano|highest mountain|mountain in|physicist|herpetologist|athlete|businessman)\b/i;
 const SKIP_SECTIONS = /^(references|notes|external links|further reading|see also|bibliography|sources|citations|footnotes|works cited|explanatory notes|notes and references|in popular culture|filmography|gallery)$/i;
 if(!CATS[state.filters.cat]) state.filters.cat = "any";
 let busy = false, drawerOpen = false;
