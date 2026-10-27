@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Night File</title>
+<meta name="description" content="Dark true stories from Wikipedia, for reading before bed.">
+<meta name="theme-color" content="#0e1117">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=Newsreader:opsz,ital,wght@6..72,0,400;6..72,0,500;6..72,1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow reading column, like a case folder opened under a bedside lamp. Dark-only for night reading. */
+:root{
+  --ink:#0e1117; --folder:#161a22; --rule:#272d39; --paper:#e4ddcf; --dim:#8b909c; --lamp:#d6a25a; --warn:#d07a68;
+  --f-display:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --f-body:"Newsreader","Iowan Old Style",Georgia,serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --size:18px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--paper)}
+body{font-family:var(--f-body);font-size:var(--size);line-height:1.65;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-top:calc(20px + env(safe-area-inset-top, 0px));
+  padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));
+  background:radial-gradient(120% 60% at 50% -10%, #1d2230 0%, var(--ink) 60%) fixed, var(--ink);}
+img{max-width:100%;height:auto}
+[hidden]{display:none!important}
+.wrap{max-width:660px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+
+.mast{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.mast b{font-family:var(--f-display);font-size:22px;letter-spacing:.02em;text-transform:none;color:var(--paper);font-weight:700;cursor:pointer}
+.mast b span{color:var(--lamp)}
+.mast .tools{display:flex;gap:6px}
+
+.search{display:flex;gap:8px}
+.search input{flex:1;min-width:0;font:inherit;font-size:16px;background:var(--folder);color:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:10px 12px}
+.search input::placeholder{color:var(--dim)}
+.search input:focus-visible{outline:2px solid var(--lamp);outline-offset:1px}
+
+.filters{display:flex;flex-direction:column;gap:10px}
+.frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.frow > span{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-right:4px}
+.chip{font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;padding:6px 10px;border-radius:999px;border:1px solid var(--rule);background:transparent;color:var(--dim);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--lamp);color:var(--paper);background:color-mix(in srgb, var(--lamp) 16%, transparent)}
+.more{all:unset;cursor:pointer;font-family:var(--f-mono);font-size:12px;color:var(--lamp);padding:6px 4px}
+.drawer{display:flex;flex-direction:column;gap:8px;background:var(--folder);border:1px solid var(--rule);border-radius:4px;padding:14px}
+.drawer h4{margin:6px 0 0;font-family:var(--f-display);font-weight:500;font-size:17px;color:var(--lamp)}
+.drawer h4:first-child{margin-top:0}
+
+.file{background:var(--folder);border:1px solid var(--rule);border-radius:4px;overflow:hidden;display:flex;flex-direction:column}
+.file .hero{width:100%;max-height:300px;object-fit:cover;display:block;background:#0a0c10;filter:saturate(.85)}
+.file .body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.tag{border:1px solid var(--lamp);color:var(--lamp);border-radius:2px;padding:1px 7px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,7vw,40px);line-height:1.12;margin:0;text-wrap:balance}
+.desc{margin:0;color:var(--dim);font-style:italic}
+.lede{margin:0}
+.wait{font-family:var(--f-mono);font-size:13px;letter-spacing:.06em;color:var(--dim);display:flex;align-items:center;gap:10px;padding:18px 20px}
+.wait::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--lamp);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.2}}
+.msg{font-size:16px;border-left:2px solid var(--warn);padding-left:12px;margin:0 20px 18px}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+button,.btn{font-family:var(--f-mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;border-radius:3px;padding:11px 16px;border:1px solid var(--rule);background:transparent;color:var(--paper);display:inline-flex;align-items:center;gap:8px}
+button.primary{background:var(--lamp);border-color:var(--lamp);color:#1a1307;font-weight:500}
+button.small{padding:6px 10px;font-size:11px}
+button:hover,.btn:hover{border-color:var(--lamp)}
+button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
+button[disabled]{opacity:.35;cursor:default}
+
+.toc{border-left:2px solid var(--lamp);padding:4px 0 4px 16px;display:flex;flex-direction:column;gap:6px}
+.toc > span{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.toc ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:2px}
+.toc li::marker{font-family:var(--f-mono);font-size:13px;color:var(--dim)}
+.toc button{all:unset;cursor:pointer;color:var(--paper);font-size:17px;text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:4px}
+
+/* Wikipedia article */
+#article{max-width:64ch;display:flex;flex-direction:column;gap:.9em;overflow-wrap:anywhere}
+#article section{display:flex;flex-direction:column;gap:.9em}
+#article p,#article ul,#article ol,#article blockquote,#article dl{margin:0}
+#article ul,#article ol{padding-left:1.3em}
+#article p.lead::first-letter{font-family:var(--f-display);float:left;font-size:3.4em;line-height:.85;padding:6px 8px 0 0;color:var(--lamp)}
+#article h2{font-family:var(--f-display);font-weight:500;font-size:26px;line-height:1.2;margin:.8em 0 0;padding-bottom:6px;border-bottom:1px solid var(--rule);scroll-margin-top:16px}
+#article h3{font-family:var(--f-display);font-weight:500;font-size:20px;margin:.5em 0 0;color:var(--lamp)}
+#article h4{font-family:var(--f-mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:.4em 0 0;color:var(--dim)}
+#article a{color:var(--paper);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--lamp) 55%,transparent);text-underline-offset:3px}
+#article blockquote{border-left:2px solid var(--rule);padding-left:14px;color:var(--dim);font-style:italic}
+#article figure{margin:.4em 0;display:flex;flex-direction:column;gap:6px}
+#article figure img{border-radius:3px;max-height:70vh;width:auto;align-self:flex-start;background:#0a0c10}
+#article figcaption{font-size:14px;line-height:1.45;color:var(--dim)}
+#article .tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px}
+#article table{border-collapse:collapse;font-size:14px;line-height:1.4;min-width:100%}
+#article th,#article td{border-bottom:1px solid var(--rule);padding:6px 8px;text-align:left;vertical-align:top}
+#article .infobox-wrap{background:var(--folder);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+#article .infobox-wrap table{width:100%;font-size:14px}
+#article .infobox-wrap th{color:var(--dim);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;width:38%}
+#article .infobox-wrap img{display:block;margin:0 auto;max-height:340px;width:auto}
+#article ul.gallery{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+#article .speaking{background:color-mix(in srgb,var(--lamp) 14%,transparent);box-shadow:-8px 0 0 color-mix(in srgb,var(--lamp) 14%,transparent),8px 0 0 color-mix(in srgb,var(--lamp) 14%,transparent);border-radius:2px}
+.credit{font-size:14px;color:var(--dim);border-top:1px solid var(--rule);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.credit a{color:var(--lamp)}
+
+.list{display:flex;flex-direction:column;gap:10px}
+.list h3{margin:0;font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:400}
+.list ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.list li button{all:unset;cursor:pointer;display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule);width:100%}
+.list li button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+.list .th{width:56px;height:56px;border-radius:3px;object-fit:cover;background:var(--folder);border:1px solid var(--rule)}
+.list .tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.list .t{font-family:var(--f-display);font-size:18px;line-height:1.25}
+.list li button:hover .t{color:var(--lamp)}
+.list .s{font-size:14px;color:var(--dim);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.lib{border-top:1px solid var(--rule);padding-top:18px}
+
+/* Listen bar */
+.player{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--folder) 96%,transparent);border-top:1px solid var(--rule);backdrop-filter:blur(8px);
+  padding:10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
+.player .in{max-width:660px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.player select{font-family:var(--f-mono);font-size:12px;background:var(--ink);color:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:8px 6px;max-width:100%}
+.player #voice{flex:1;min-width:120px}
+.player .left{font-family:var(--f-mono);font-size:11px;color:var(--dim);letter-spacing:.06em}
+.fade{animation:fade .5s ease both}
+@keyframes fade{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.fade,.wait::before{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <b id="home" title="Back to tonight's story">Night<span>/</span>File</b>
+    <div class="tools">
+      <button class="small" id="smaller" type="button" aria-label="Smaller text">A−</button>
+      <button class="small" id="bigger" type="button" aria-label="Larger text">A+</button>
+    </div>
+  </header>
+
+  <form class="search" id="search" role="search">
+    <input id="q" type="search" placeholder="Search Wikipedia: a case, killer, disaster or topic" autocomplete="off" aria-label="Search">
+    <button type="submit" id="go">Find</button>
+  </form>
+
+  <div class="filters">
+    <div class="frow" id="cats" role="group" aria-label="Category"></div>
+    <div class="drawer" id="drawer" hidden></div>
+    <div class="frow" id="eras" role="group" aria-label="Era"><span>Era</span></div>
+  </div>
+
+  <section class="file" id="file" aria-live="polite">
+    <div class="wait" id="wait">Opening the case file…</div>
+    <p class="msg" id="msg" hidden></p>
+    <div class="list" id="results" hidden style="padding:16px 20px"><h3 id="resultsHead">Results</h3><ul id="resultsList"></ul></div>
+    <div id="card" hidden>
+      <img class="hero" id="hero" alt="" hidden>
+      <div class="body">
+        <div class="meta"><span class="tag" id="cat"></span><span id="mins"></span></div>
+        <h1 id="title"></h1>
+        <p class="desc" id="desc"></p>
+        <p class="lede" id="lede"></p>
+        <div class="actions" id="actions">
+          <button class="primary" id="read" type="button">Read the full article</button>
+          <button id="another" type="button">↻ Different story</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="toc" id="toc" aria-label="Contents" hidden></nav>
+  <article id="article"></article>
+  <div class="credit" id="credit" hidden></div>
+  <div class="actions" id="after" hidden><button class="primary" id="next" type="button">↻ Next story</button></div>
+
+  <section class="list lib" id="lib" hidden><h3>Stories you've opened</h3><ul id="libList"></ul></section>
+</div>
+
+<div class="player" id="player" hidden>
+  <div class="in">
+    <button class="primary" id="play" type="button">▶ Listen</button>
+    <select id="voice" aria-label="Voice"></select>
+    <select id="rate" aria-label="Speed">
+      <option value="0.8">0.8×</option><option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.1">1.1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+    </select>
+    <select id="sleep" aria-label="Sleep timer">
+      <option value="0">No timer</option><option value="15">Stop in 15 min</option><option value="30">Stop in 30 min</option><option value="45">Stop in 45 min</option><option value="60">Stop in 60 min</option>
+    </select>
+    <span class="left" id="left"></span>
+  </div>
+</div>
+
+<script>
+"use strict";
+const API = "https://en.wikipedia.org/w/api.php";
+const REST = "https://en.wikipedia.org/api/rest_v1/page/html/";
+const el = id => document.getElementById(id);
+const KEY = "nightfile.wiki.v1";
+let state = {seen:[], library:[], current:null, queue:{key:"", items:[]}, filters:{cat:"any", era:"modern"}, size:18, progress:{}, voice:"", rate:"1"};
+try{ const s = JSON.parse(localStorage.getItem(KEY)||"null"); if(s) state = Object.assign(state, s); }catch(e){}
+const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} };
+const reduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const pickOne = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a = [...a]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const norm = s => String(s||"").trim().toLowerCase();
+
+/* Each category: Wikipedia search queries (CirrusSearch). Category and template queries are sampled at random; keyword queries by relevance. */
+const SECTIONS = [
+  ["True crime", {
+    serial:   {label:"Serial killers", q:['hastemplate:"Infobox serial killer"','incategory:American_serial_killers|English_serial_killers|German_serial_killers|Russian_serial_killers|Canadian_serial_killers|Australian_serial_killers|South_African_serial_killers|Colombian_serial_killers|Japanese_serial_killers|French_serial_killers']},
+    captive:  {label:"Held captive", q:['"held captive" kidnapping convicted','"held captive" years rescued','incategory:Kidnappings_in_the_United_States|Kidnappings_in_England']},
+    family:   {label:"Family murders", q:['familicide','"family annihilator"','"murdered his wife and" children convicted','"killed her children" convicted']},
+    medical:  {label:"Medical killers", q:['incategory:Medical_serial_killers','"serial killer" nurse patients convicted','doctor murdered patients convicted']},
+    pairs:    {label:"Killer couples", q:['incategory:Serial_killer_duos','"killer couple"','"serial killer couple"']},
+    cold:     {label:"Cold cases cracked", q:['"genetic genealogy" murder arrested','"cold case" DNA murder convicted decades']},
+    web:      {label:"Online & dark web", q:['murder "dark web" convicted','murder livestreamed','murder "met online" convicted']},
+    unsolved: {label:"Unsolved murders", q:['incategory:Unsolved_murders_in_the_United_States|Unsolved_murders_in_England|Unsolved_murders_in_Canada|Unsolved_murders_in_Australia|Unsolved_murders_in_Germany','unsolved murder mystery']}
+  }],
+  ["The unexplained", {
+    unexplained:{label:"Strange deaths & vanishings", q:['incategory:Unexplained_disappearances|Unsolved_deaths|Missing_person_cases_in_the_United_States','mysterious death unexplained circumstances']},
+    ufo:      {label:"UFOs & aliens", q:['incategory:UFO_sightings|UFO_sightings_in_the_United_States|Alien_abduction','UFO incident sighting witnesses','alien abduction claim']},
+    haunted:  {label:"Hauntings & exorcisms", q:['poltergeist case','exorcism death trial','incategory:Reportedly_haunted_locations_in_the_United_States|Reportedly_haunted_locations_in_England']},
+    hysteria: {label:"Mass hysteria & panics", q:['"mass hysteria"','"mass psychogenic illness"','"moral panic"']},
+    signals:  {label:"Eerie signals & broadcasts", q:['"broadcast signal intrusion"','unexplained radio signal','"numbers station"']}
+  }],
+  ["Air, sea & space", {
+    air:      {label:"Air disasters", q:['hastemplate:"Infobox aircraft occurrence"','hastemplate:"Infobox aircraft occurrence" crash fatalities']},
+    ships:    {label:"Shipwrecks", q:['sinking "lives were lost"','ferry disaster capsized','shipwreck sank passengers drowned']},
+    subs:     {label:"Submarines & submersibles", q:['submarine disaster crew lost','submersible implosion','submarine sank all hands']},
+    diving:   {label:"Deep sea & diving", q:['"cave diving" death','"saturation diving" accident','diving accident divers died','freediving death']},
+    space:    {label:"Space disasters", q:['incategory:Spaceflight_accidents_and_incidents|Space_accidents_and_incidents','spacecraft disaster crew killed']}
+  }],
+  ["Extreme nature", {
+    mountains:{label:"Mountains & climbing", q:['incategory:Mountaineering_disasters|Mountaineering_deaths','mountaineering disaster climbers died']},
+    caves:    {label:"Caves & mines", q:['incategory:Mining_disasters|Caving_incidents','mine disaster miners killed','cave rescue trapped']},
+    lost:     {label:"Lost in the wild", q:['lost wilderness survived days rescued','expedition disappeared perished','stranded survived rescued']},
+    animals:  {label:"Animal attacks", q:['incategory:Deaths_due_to_animal_attacks|Deaths_due_to_shark_attacks|Deaths_due_to_bear_attacks','fatal animal attack','man-eating']},
+    natural:  {label:"Natural disasters", q:['hastemplate:"Infobox earthquake"','volcanic eruption killed','avalanche disaster killed','tsunami killed']}
+  }],
+  ["Science & industry", {
+    nuclear:  {label:"Nuclear & radiation", q:['incategory:Nuclear_accidents_and_incidents|Radiation_accidents_and_incidents|Civilian_nuclear_power_accidents','radiation exposure accident deaths']},
+    industrial:{label:"Industrial disasters", q:['incategory:Industrial_disasters|Building_collapses|Explosions_in_the_United_States','industrial disaster explosion killed','chemical leak disaster']},
+    experiments:{label:"Medical experiments", q:['incategory:Unethical_human_experimentation|Human_subject_research_in_the_United_States','unethical human experimentation']},
+    outbreaks:{label:"Outbreaks & poisonings", q:['incategory:Mass_poisonings|Disease_outbreaks','outbreak deaths epidemic','mass poisoning']}
+  }],
+  ["Dark history", {
+    cults:    {label:"Cults", q:['incategory:Cults','cult leader followers deaths','cult "mass suicide"']},
+    survival: {label:"Survival horror", q:['"survival cannibalism"','survivors stranded rescued disaster','trapped survived days']},
+    inspired: {label:"Behind horror films", q:['"inspired the film" murder','"inspired the horror film"','murder "inspired the novel"']},
+    places:   {label:"Dark places", q:['incategory:Reportedly_haunted_locations_in_the_United_States|Reportedly_haunted_locations_in_England|Psychiatric_hospitals_in_the_United_States','abandoned asylum history','massacre site memorial']}
+  }]
+];
+const CATS = {any:{label:"Surprise me"}};
+SECTIONS.forEach(([, c]) => Object.assign(CATS, c));
+const SURPRISE = Object.keys(CATS).filter(k => k !== "any" && k !== "unsolved");
+const ERAS = {modern:"1990–now", any:"Any era"};
+const BLOCK = /dahmer|\bgein\b|^list of|^lists of|\(disambiguation\)|^timeline of|^outline of|^index of|^history of|^category:/i;
+const SKIP_SECTIONS = /^(references|notes|external links|further reading|see also|bibliography|sources|citations|footnotes|works cited|explanatory notes|notes and references|in popular culture|filmography|gallery)$/i;
+if(!CATS[state.filters.cat]) state.filters.cat = "any";
+let busy = false, drawerOpen = false;
+
+/* ---------- Wikipedia API ---------- */
+async function api(params){
+  const u = new URL(API);
+  Object.entries(Object.assign({format:"json", formatversion:"2", origin:"*"}, params)).forEach(([k,v]) => { if(v !== undefined) u.searchParams.set(k, v); });
+  const r = await fetch(u);
+  if(!r.ok) throw new Error("Wikipedia returned " + r.status);
+  const j = await r.json();
+  if(j.error) throw Object.assign(new Error(j.error.info || "Wikipedia error"), {code:j.error.code});
+  return j;
+}
+
+async function searchPool(q){
+  const structured = /incategory:|hastemplate:/.test(q);
+  const base = {action:"query", list:"search", srsearch:q, srnamespace:0, srlimit:50, srprop:"size|wordcount"};
+  try{
+    if(structured){ const j = await api(Object.assign({srsort:"random"}, base)); return j.query.search || []; }
+    const j = await api(Object.assign({sroffset: Math.floor(Math.random()*120)}, base));
+    if((j.query.search||[]).length) return j.query.search;
+    return (await api(base)).query.search || [];
+  }catch(e){
+    if(structured){ const j = await api(Object.assign({sroffset: Math.floor(Math.random()*100)}, base)); return j.query.search || []; }
+    throw e;
+  }
+}
+
+async function details(titles){
+  if(!titles.length) return [];
+  const j = await api({action:"query", prop:"extracts|pageimages|description", exintro:1, explaintext:1, exlimit:20,
+    piprop:"thumbnail", pithumbsize:900, pilimit:20, redirects:1, titles:titles.slice(0,20).join("|")});
+  return (j.query.pages || []).filter(p => !p.missing && p.extract).map(p => ({
+    title:p.title, extract:p.extract, desc:p.description || "", thumb:p.thumbnail ? p.thumbnail.source : ""
+  }));
+}
+
+function eraOK(text){
+  let t = text.slice(0, 1600);
+  t = t.replace(/\([^)]{0,140}\)/, m => /born|died|\b(1[5-9]\d\d|20\d\d)\s*[–-]|\bc\.\s*\d{4}|\bb\.\s/i.test(m) ? "" : m);
+  const years = [...t.matchAll(/\b(1[5-9]\d\d|20[0-2]\d)\b/g)].map(m => +m[1]);
+  return !years.length || Math.min(...years) >= 1990;
+}
+
+/* ---------- picking stories ---------- */
+const qKey = () => state.filters.cat + "|" + state.filters.era;
+const isSeen = t => state.seen.map(norm).includes(norm(t));
+
+async function batch(){
+  for(let attempt = 0; attempt < 4; attempt++){
+    const catKey = state.filters.cat === "any" ? pickOne(SURPRISE) : state.filters.cat;
+    const cat = CATS[catKey];
+    for(const q of shuffle(cat.q)){
+      const pool = (await searchPool(q)).filter(r => !BLOCK.test(r.title) && !isSeen(r.title) && r.size >= 9000);
+      if(!pool.length) continue;
+      const words = Object.fromEntries(pool.map(r => [r.title, r.wordcount]));
+      const top = shuffle(pool.sort((a,b) => b.size - a.size).slice(0, 30)).slice(0, 20).map(r => r.title);
+      let items = (await details(top)).filter(d => !BLOCK.test(d.title) && !isSeen(d.title));
+      if(state.filters.era === "modern") items = items.filter(d => eraOK(d.extract));
+      if(items.length) return shuffle(items).map(d => Object.assign(d, {cat:cat.label, words:words[d.title] || 0}));
+    }
+  }
+  return [];
+}
+
+function take(){
+  if(state.queue.key !== qKey()) return null;
+  while(state.queue.items.length){ const c = state.queue.items.shift(); if(!isSeen(c.title)) return c; }
+  return null;
+}
+
+/* ---------- UI helpers ---------- */
+function setWait(t){ el("wait").textContent = t || ""; el("wait").hidden = !t; }
+function setMsg(t){ el("msg").textContent = t || ""; el("msg").hidden = !t; }
+function setBusy(on){ busy = on; ["read","another","go","next"].forEach(id => el(id).disabled = on); document.querySelectorAll(".chip").forEach(b => b.disabled = on); }
+const firstSentences = (t, n) => (t.replace(/\s+/g," ").match(/[^.!?]+[.!?]+(\s|$)/g) || [t]).slice(0, n).join("").trim();
+const mins = w => w ? Math.max(1, Math.round(w/230)) + " min read" : "";
+
+function showCard(c){
+  el("results").hidden = true;
+  el("card").hidden = false;
+  el("cat").textContent = c.cat || "Wikipedia";
+  el("mins").textContent = mins(c.words);
+  el("title").textContent = c.title;
+  el("desc").textContent = c.desc ? c.desc.charAt(0).toUpperCase() + c.desc.slice(1) : "";
+  el("desc").hidden = !c.desc;
+  el("lede").textContent = firstSentences(c.extract || "", 3);
+  const hero = el("hero");
+  if(c.thumb){ hero.src = c.thumb; hero.alt = c.title; hero.hidden = false; } else { hero.removeAttribute("src"); hero.hidden = true; }
+  el("read").hidden = false;
+  el("card").classList.remove("fade"); void el("card").offsetWidth; el("card").classList.add("fade");
+}
+
+function clearArticle(){ stopListen(); el("article").innerHTML = ""; el("toc").hidden = true; el("credit").hidden = true; el("after").hidden = true; el("player").hidden = true; }
+
+function present(c){
+  state.current = c;
+  if(!isSeen(c.title)) state.seen.push(c.title);
+  state.seen = state.seen.slice(-400);
+  save(); setWait(""); setMsg(""); clearArticle(); showCard(c); renderLib();
+}
+
+async function findStory(){
+  if(busy) return;
+  const q = take();
+  if(q){ present(q); return; }
+  setBusy(true); setMsg(""); clearArticle(); el("card").hidden = true; el("results").hidden = true;
+  setWait("Digging through the archives…");
+  try{
+    const items = await batch();
+    setBusy(false); setWait("");
+    if(!items.length){ setMsg("Couldn't find a new story in this category right now. Tap Different story or pick another category."); if(state.current) showCard(state.current); return; }
+    state.queue = {key:qKey(), items:items.slice(1)};
+    present(items[0]);
+  }catch(e){
+    setBusy(false); setWait("");
+    setMsg(navigator.onLine === false ? "You're offline. Connect to the internet to pull a story." : "Couldn't reach Wikipedia. Check your connection and tap Different story.");
+    if(state.current) showCard(state.current);
+  }
+}
+
+async function search(q){
+  if(busy) return;
+  setBusy(true); setMsg(""); clearArticle(); el("card").hidden = true; el("results").hidden = true;
+  setWait("Searching Wikipedia…");
+  try{
+    const j = await api({action:"query", list:"search", srsearch:q, srnamespace:0, srlimit:12, srprop:"snippet|wordcount"});
+    const hits = (j.query.search || []).filter(r => !/\(disambiguation\)/i.test(r.title));
+    const d = await details(hits.map(h => h.title));
+    const byTitle = Object.fromEntries(d.map(x => [x.title, x]));
+    setBusy(false); setWait("");
+    if(!hits.length){ setMsg("No Wikipedia articles matched that. Try a name, a place or a topic."); return; }
+    const list = el("resultsList"); list.innerHTML = "";
+    el("resultsHead").textContent = "Results for “" + q.slice(0,60) + "”";
+    hits.forEach(h => {
+      const info = byTitle[h.title] || {title:h.title, extract:"", desc:"", thumb:""};
+      const item = Object.assign({}, info, {cat:"Search", words:h.wordcount});
+      list.append(listItem(item, firstSentences(info.extract || stripTags(h.snippet), 1), () => { present(item); openArticle(item.title); }));
+    });
+    el("results").hidden = false;
+  }catch(e){
+    setBusy(false); setWait(""); setMsg("Couldn't reach Wikipedia. Check your connection and try again.");
+  }
+}
+function stripTags(h){ const d = document.createElement("div"); d.innerHTML = h || ""; return d.textContent; }
+
+function listItem(c, sub, onPick){
+  const li = document.createElement("li"), b = document.createElement("button"); b.type = "button";
+  const img = document.createElement("img"); img.className = "th"; img.alt = ""; img.loading = "lazy";
+  if(c.thumb) img.src = c.thumb; else img.style.visibility = "hidden";
+  const tx = document.createElement("span"); tx.className = "tx";
+  const t = document.createElement("span"); t.className = "t"; t.textContent = c.title;
+  const s = document.createElement("span"); s.className = "s"; s.textContent = sub || c.desc || c.cat || "";
+  tx.append(t, s); b.append(img, tx); b.addEventListener("click", onPick);
+  li.append(b); return li;
+}
+
+function renderLib(){
+  const list = el("libList"); list.innerHTML = "";
+  const items = state.library.filter(x => !state.current || x.title !== state.current.title).slice(0, 40);
+  items.forEach(c => list.append(listItem(c, c.cat + (state.progress[c.title] ? " · " + Math.round(state.progress[c.title]*100) + "% read" : ""), () => {
+    if(busy) return; present(c); openArticle(c.title, true);
+  })));
+  el("lib").hidden = items.length === 0;
+}
+
+/* ---------- filters ---------- */
+function chip(k, group){
+  const b = document.createElement("button"); b.type = "button"; b.className = "chip";
+  b.textContent = group === "era" ? ERAS[k] : CATS[k].label;
+  b.setAttribute("aria-pressed", String(group === "era" ? state.filters.era === k : state.filters.cat === k));
+  b.disabled = busy;
+  b.addEventListener("click", () => {
+    if(busy) return;
+    if(group === "era"){ if(state.filters.era === k) return; state.filters.era = k; }
+    else { drawerOpen = false; if(state.filters.cat === k){ renderFilters(); return; } state.filters.cat = k; }
+    state.queue = {key:"", items:[]}; save(); renderFilters(); findStory();
+  });
+  return b;
+}
+function renderFilters(){
+  const cats = el("cats"); cats.innerHTML = "";
+  cats.append(chip("any"));
+  if(state.filters.cat !== "any") cats.append(chip(state.filters.cat));
+  const more = document.createElement("button"); more.type = "button"; more.className = "more";
+  more.setAttribute("aria-expanded", String(drawerOpen));
+  more.textContent = drawerOpen ? "Close sections" : "All sections ▾";
+  more.addEventListener("click", () => { drawerOpen = !drawerOpen; renderFilters(); });
+  cats.append(more);
+  const drawer = el("drawer"); drawer.innerHTML = ""; drawer.hidden = !drawerOpen;
+  if(drawerOpen) SECTIONS.forEach(([name, group]) => {
+    const h = document.createElement("h4"); h.textContent = name;
+    const row = document.createElement("div"); row.className = "frow";
+    Object.keys(group).forEach(k => row.append(chip(k)));
+    drawer.append(h, row);
+  });
+  const eras = el("eras"); eras.querySelectorAll(".chip").forEach(n => n.remove());
+  Object.keys(ERAS).forEach(k => eras.append(chip(k, "era")));
+}
+
+/* ---------- full article ---------- */
+const DROP = "script,style,link,meta,iframe,object,embed,noscript,audio,video,sup.reference,sup.mw-ref,.mw-ref,.reference,.mw-editsection,.navbox,.navbox-styles,.vertical-navbox,.sidebar,.metadata,.ambox,.ombox,.tmbox,.cmbox,.hatnote,.dablink,.shortdescription,.sistersitebox,.side-box,.mw-empty-elt,.noprint,.reflist,.refbegin,.mw-references-wrap,ol.references,.portalbox,.authority-control,.mbox-small,.coordinates,.geo-nondefault,.mw-kartographer-maplink,.box-More_citations_needed,.module-shortcutboxplain,link[rel=mw-deduplicated-inline-style]";
+const KEEP_CLASS = ["infobox","wikitable","gallery"];
+
+function sanitize(html){
+  const doc = new DOMParser().parseFromString(html, "text/html");
+  const body = doc.body;
+  body.querySelectorAll(DROP).forEach(n => n.remove());
+  // drop reference/appendix sections
+  body.querySelectorAll("h2").forEach(h => {
+    if(!SKIP_SECTIONS.test(h.textContent.trim())) return;
+    const sec = h.closest("section");
+    if(sec && sec.querySelector("h2") === h) { sec.remove(); return; }
+    const start = h.closest(".mw-heading") || h;
+    let n = start.nextSibling; start.remove();
+    while(n && !(n.nodeType === 1 && (n.matches("h2") || n.matches(".mw-heading2") || n.querySelector?.(":scope > h2")))){ const nx = n.nextSibling; n.remove(); n = nx; }
+  });
+  body.querySelectorAll("img").forEach(img => {
+    const w = +img.getAttribute("width") || 0;
+    let s = img.getAttribute("src") || img.getAttribute("data-src") || "";
+    if(s.startsWith("//")) s = "https:" + s;
+    if(!/^https:\/\/upload\.wikimedia\.org\//.test(s) || (w && w < 50)){ img.remove(); return; }
+    s = s.replace(/\/(\d+)px-/, (m, n) => +n < 640 ? "/640px-" : m);
+    img.setAttribute("src", s); img.setAttribute("loading", "lazy");
+  });
+  body.querySelectorAll("a").forEach(a => {
+    const href = a.getAttribute("href") || "";
+    if(href.startsWith("./")){
+      const raw = decodeURIComponent(href.slice(2)).split("#")[0];
+      if(/^(File|Special|Help|Wikipedia|Template|Template_talk|Category|Portal|Talk|User|Module|Draft):/i.test(raw) || !raw){ a.replaceWith(...a.childNodes); return; }
+      a.setAttribute("href", "https://en.wikipedia.org/wiki/" + raw);
+      a.setAttribute("data-wiki", raw.replace(/_/g, " "));
+    } else if(/^https?:/.test(href)){
+      a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener");
+    } else { a.replaceWith(...a.childNodes); }
+  });
+  body.querySelectorAll("*").forEach(n => {
+    [...n.attributes].forEach(at => {
+      const k = at.name;
+      if(k === "class"){
+        const keep = n.className.split(/\s+/).filter(c => KEEP_CLASS.includes(c));
+        keep.length ? n.setAttribute("class", keep.join(" ")) : n.removeAttribute("class");
+      } else if(!["href","src","alt","data-wiki","colspan","rowspan","loading","target","rel"].includes(k)) n.removeAttribute(k);
+    });
+  });
+  body.querySelectorAll("table").forEach(t => {
+    const wrap = doc.createElement("div");
+    wrap.className = t.classList.contains("infobox") ? "infobox-wrap" : "tablewrap";
+    t.replaceWith(wrap); wrap.append(t);
+  });
+  body.querySelectorAll("p").forEach(p => { if(!p.textContent.trim() && !p.querySelector("img")) p.remove(); });
+  body.querySelectorAll("span:empty, div:empty").forEach(n => n.remove());
+  return body;
+}
+
+let openToken = 0;
+async function openArticle(title, restore){
+  const token = ++openToken;
+  clearArticle();
+  el("read").hidden = true;
+  setMsg(""); setWait("Opening the full article…");
+  try{
+    const r = await fetch(REST + encodeURIComponent(title.replace(/ /g, "_")) + "?redirect=true");
+    if(!r.ok) throw new Error("status " + r.status);
+    const html = await r.text();
+    if(token !== openToken) return;
+    const body = sanitize(html);
+    const art = el("article");
+    art.replaceChildren(...[...body.childNodes].map(n => document.importNode(n, true)));
+    const firstP = [...art.querySelectorAll("p")].find(p => !p.closest(".infobox-wrap,.tablewrap,figure") && p.textContent.trim().length > 60);
+    if(firstP) firstP.classList.add("lead");
+    buildToc();
+    const words = (art.textContent.match(/\S+/g) || []).length;
+    el("mins").textContent = mins(words);
+    const page = "https://en.wikipedia.org/wiki/" + encodeURIComponent(title.replace(/ /g, "_"));
+    const credit = el("credit"); credit.innerHTML = "";
+    const p1 = document.createElement("span");
+    p1.append("This article comes from ");
+    const a1 = document.createElement("a"); a1.href = page; a1.target = "_blank"; a1.rel = "noopener"; a1.textContent = "Wikipedia: " + title;
+    p1.append(a1, ". Text is available under ");
+    const a2 = document.createElement("a"); a2.href = "https://creativecommons.org/licenses/by-sa/4.0/"; a2.target = "_blank"; a2.rel = "noopener"; a2.textContent = "CC BY-SA 4.0";
+    p1.append(a2, ", written by Wikipedia's volunteer editors. References were removed for easier reading; the original has them all.");
+    const a3 = document.createElement("a"); a3.href = "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(title); a3.target = "_blank"; a3.rel = "noopener"; a3.textContent = "More photos of " + title + " ↗";
+    credit.append(p1, a3);
+    credit.hidden = false; el("after").hidden = false;
+    setWait("");
+    const c = state.current;
+    if(c) c.words = words;
+    if(c){
+      state.library = [Object.assign({}, c), ...state.library.filter(x => x.title !== c.title)].slice(0, 60);
+      save(); renderLib();
+    }
+    setupPlayer();
+    if(restore && state.progress[title]){
+      requestAnimationFrame(() => {
+        const top = art.offsetTop, h = art.offsetHeight;
+        window.scrollTo({top: top + h * state.progress[title] - 80});
+      });
+    } else {
+      el("article").scrollIntoView({behavior: reduce() ? "auto" : "smooth", block: "start"});
+    }
+  }catch(e){
+    if(token !== openToken) return;
+    setWait(""); setMsg("Couldn't load the full article. Check your connection and try again.");
+    el("read").hidden = false;
+  }
+}
+
+function buildToc(){
+  const toc = el("toc"); toc.innerHTML = "";
+  const hs = [...el("article").querySelectorAll("h2")];
+  if(hs.length < 2){ toc.hidden = true; return; }
+  const lab = document.createElement("span"); lab.textContent = "Contents";
+  const ol = document.createElement("ol");
+  hs.forEach((h, i) => {
+    h.id = "s-" + i;
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.type = "button"; b.textContent = h.textContent;
+    b.addEventListener("click", () => h.scrollIntoView({behavior: reduce() ? "auto" : "smooth", block:"start"}));
+    li.append(b); ol.append(li);
+  });
+  toc.append(lab, ol); toc.hidden = false;
+}
+
+// links inside an article open that article here
+el("article").addEventListener("click", ev => {
+  const a = ev.target.closest("a[data-wiki]");
+  if(!a) return;
+  ev.preventDefault();
+  if(busy) return;
+  openLinked(a.getAttribute("data-wiki"));
+});
+
+async function openLinked(title){
+  window.scrollTo({top:0});
+  let d = null;
+  try{ d = (await details([title]))[0]; }catch(e){}
+  const item = Object.assign({title, extract:"", desc:"", thumb:""}, d || {}, {cat:"Linked story"});
+  present(item);
+  openArticle(item.title);
+}
+
+// remember reading position
+let progT = 0;
+addEventListener("scroll", () => {
+  clearTimeout(progT);
+  progT = setTimeout(() => {
+    const art = el("article"); const c = state.current;
+    if(!c || !art.childNodes.length) return;
+    const h = art.offsetHeight; if(h < 400) return;
+    const p = Math.min(1, Math.max(0, (scrollY + 80 - art.offsetTop) / h));
+    if(p > 0.02){ state.progress[c.title] = Math.round(p * 100) / 100; save(); }
+  }, 400);
+}, {passive:true});
+
+/* ---------- listen mode ---------- */
+const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
+let tts = {on:false, blocks:[], bi:0, cur:null, chunks:[], ci:0, timer:0, endAt:0, tick:0};
+let voices = [];
+
+function loadVoices(){
+  if(!synth) return;
+  voices = synth.getVoices().filter(v => /^en/i.test(v.lang));
+  if(!voices.length) voices = synth.getVoices();
+  const sel = el("voice"); sel.innerHTML = "";
+  const def = document.createElement("option"); def.value = ""; def.textContent = "Default voice"; sel.append(def);
+  voices.forEach(v => { const o = document.createElement("option"); o.value = v.name; o.textContent = v.name.replace(/\s*\(.*\)\s*/,"") + " · " + v.lang; sel.append(o); });
+  sel.value = voices.some(v => v.name === state.voice) ? state.voice : "";
+}
+if(synth){ loadVoices(); synth.addEventListener?.("voiceschanged", loadVoices); synth.onvoiceschanged = loadVoices; }
+
+function setupPlayer(){
+  el("player").hidden = !synth || !el("article").childNodes.length;
+  el("rate").value = state.rate || "1";
+  updatePlay();
+}
+function readable(){
+  return [...el("article").querySelectorAll("p, li, h2, h3, blockquote")].filter(n =>
+    !n.closest(".infobox-wrap, .tablewrap, figure, .gallery") && !(n.tagName === "LI" && n.querySelector("p")) && n.textContent.trim().length > 1);
+}
+function chunk(text){
+  const s = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]+["')\]]*\s*|[^.!?]+$/g) || [text];
+  const out = []; let cur = "";
+  s.forEach(x => { if((cur + x).length > 220 && cur){ out.push(cur); cur = x; } else cur += x; });
+  if(cur.trim()) out.push(cur);
+  return out;
+}
+function mark(n){ document.querySelectorAll(".speaking").forEach(x => x.classList.remove("speaking")); if(n){ n.classList.add("speaking");
+  const r = n.getBoundingClientRect(); if(r.top < 60 || r.bottom > innerHeight - 120) n.scrollIntoView({behavior: reduce() ? "auto" : "smooth", block:"center"}); } }
+function firstVisible(blocks){ const i = blocks.findIndex(b => b.getBoundingClientRect().bottom > 80); return i < 0 ? 0 : i; }
+
+function speakNext(){
+  if(!tts.on) return;
+  while(tts.ci >= tts.chunks.length){
+    if(tts.bi >= tts.blocks.length){ stopListen(); return; }
+    tts.cur = tts.blocks[tts.bi++]; tts.chunks = chunk(tts.cur.textContent); tts.ci = 0; mark(tts.cur);
+  }
+  const u = new SpeechSynthesisUtterance(tts.chunks[tts.ci++]);
+  const v = voices.find(x => x.name === state.voice);
+  if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US";
+  u.rate = +state.rate || 1;
+  u.onend = () => speakNext();
+  u.onerror = e => { if(tts.on && e.error !== "interrupted" && e.error !== "canceled") speakNext(); };
+  synth.speak(u);
+}
+function startListen(){
+  if(!synth) return;
+  synth.cancel();
+  tts.blocks = readable();
+  if(!tts.blocks.length) return;
+  const resumeAt = tts.cur ? tts.blocks.indexOf(tts.cur) : -1;
+  tts.bi = resumeAt >= 0 ? resumeAt : firstVisible(tts.blocks);
+  tts.chunks = []; tts.ci = 0; tts.on = true;
+  armSleep(); updatePlay(); speakNext();
+}
+function pauseListen(){ tts.on = false; synth && synth.cancel(); updatePlay(); }
+function stopListen(){ tts.on = false; if(synth) synth.cancel(); tts.cur = null; mark(null); clearTimeout(tts.timer); clearInterval(tts.tick); tts.endAt = 0; el("left").textContent = ""; updatePlay(); }
+function updatePlay(){ el("play").textContent = tts.on ? "❚❚ Pause" : (tts.cur ? "▶ Resume" : "▶ Listen"); }
+function armSleep(){
+  clearTimeout(tts.timer); clearInterval(tts.tick);
+  const m = +el("sleep").value;
+  if(!m){ tts.endAt = 0; el("left").textContent = ""; return; }
+  tts.endAt = Date.now() + m * 60000;
+  tts.timer = setTimeout(() => { stopListen(); el("sleep").value = "0"; }, m * 60000);
+  const show = () => { const left = Math.max(0, Math.ceil((tts.endAt - Date.now()) / 60000)); el("left").textContent = left + " min left"; };
+  show(); tts.tick = setInterval(show, 30000);
+}
+el("play").addEventListener("click", () => tts.on ? pauseListen() : startListen());
+el("voice").addEventListener("change", () => { state.voice = el("voice").value; save(); if(tts.on) startListen(); });
+el("rate").addEventListener("change", () => { state.rate = el("rate").value; save(); if(tts.on) startListen(); });
+el("sleep").addEventListener("change", () => { if(tts.on) armSleep(); });
+
+/* ---------- text size ---------- */
+function applySize(){ document.documentElement.style.setProperty("--size", state.size + "px"); }
+el("smaller").addEventListener("click", () => { state.size = Math.max(15, state.size - 1); applySize(); save(); });
+el("bigger").addEventListener("click", () => { state.size = Math.min(26, state.size + 1); applySize(); save(); });
+
+/* ---------- wiring ---------- */
+el("read").addEventListener("click", () => state.current && openArticle(state.current.title));
+el("another").addEventListener("click", () => findStory());
+el("next").addEventListener("click", () => { window.scrollTo({top:0, behavior: reduce() ? "auto" : "smooth"}); findStory(); });
+el("home").addEventListener("click", () => { window.scrollTo({top:0, behavior: reduce() ? "auto" : "smooth"}); });
+el("search").addEventListener("submit", ev => { ev.preventDefault(); const q = el("q").value.trim(); if(q){ el("q").blur(); search(q); } });
+
+applySize(); renderFilters(); renderLib();
+findStory();
+
+if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
