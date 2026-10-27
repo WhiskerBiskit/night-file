@@ -83,6 +83,8 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 .chip{font-family:var(--f-mono);font-size:13px;letter-spacing:.03em;text-transform:none;padding:8px 12px;border-radius:999px;border:1px solid var(--rule-hi);background:color-mix(in srgb,var(--ink) 35%,transparent);color:var(--paper);cursor:pointer}
 .chip:hover{border-color:var(--lamp)}
 .chip[aria-pressed="true"]{border-color:var(--lamp);color:#22180b;background:var(--lamp);font-weight:500}
+.more{all:unset;cursor:pointer;font-family:var(--f-mono);font-size:12px;letter-spacing:.04em;color:var(--lamp);padding:6px 4px}
+.more:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
 .panel{display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule);border-radius:8px;padding:14px;animation:drop .28s var(--ease) both;transform-origin:top;box-shadow:0 18px 40px -24px #000}
 .panel.closing{animation:drop .18s var(--ease) reverse both}
 .panel h4{margin:6px 0 0;font-family:var(--f-display);font-weight:500;font-size:17px;color:var(--lamp)}
@@ -101,6 +103,21 @@ button:active:not([disabled]),.btn:active,.chip:active{transform:scale(.96)}
 h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,7vw,40px);line-height:1.12;margin:0;text-wrap:balance}
 .desc{margin:0;color:var(--dim);font-style:italic}
 .lede{margin:0}
+/* photo strip on the card + full-size viewer */
+.heroBox{cursor:zoom-in}
+.strip{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:12px 20px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.strip::-webkit-scrollbar{display:none}
+.strip button{all:unset;flex:none;scroll-snap-align:start;height:92px;min-width:70px;border-radius:4px;overflow:hidden;border:1px solid var(--rule);background:var(--deep);cursor:zoom-in;animation:rise .45s var(--ease) both;animation-delay:calc(var(--i,0) * 70ms)}
+.strip button:focus-visible{outline:2px solid var(--lamp);outline-offset:2px}
+.strip img{height:100%;width:auto;max-width:170px;object-fit:cover;display:block;opacity:0;transition:opacity .5s var(--ease)}
+.strip img.loaded{opacity:1}
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(5,10,7,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  padding:calc(56px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));animation:rise .3s var(--ease) both}
+.lightbox img{max-width:100%;max-height:72vh;object-fit:contain;border-radius:3px;box-shadow:0 20px 60px -20px #000}
+.lightbox p{margin:0;max-width:60ch;text-align:center;font-size:15px;color:var(--soft);line-height:1.45}
+.lightbox .lbnav{display:flex;gap:10px;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--soft)}
+.lb-close{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px))}
+#article img{cursor:zoom-in}
 /* loading placeholders: a shimmering outline of the card, so nothing jumps */
 .sk{background:linear-gradient(90deg,var(--folder) 0%,var(--folder-hi) 50%,var(--folder) 100%);background-size:200% 100%;animation:shimmer 1.6s linear infinite;border-radius:4px}
 .skel{display:flex;flex-direction:column}
@@ -247,6 +264,7 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
     <p class="msg" id="msg" hidden></p>
     <div id="card" hidden>
       <div class="heroBox" id="heroBox" hidden><img class="hero" id="hero" alt=""></div>
+      <div class="strip" id="strip" hidden aria-label="Photos from this story"></div>
       <div class="body">
         <button class="back" id="back" type="button" hidden>← Back to <span id="backTitle"></span></button>
         <div class="meta"><span class="tag" id="cat"></span><span id="mins"></span></div>
@@ -288,6 +306,13 @@ button[aria-pressed="true"]#save2{border-color:var(--lamp);color:var(--lamp)}
 
   <details class="list fold" id="savedSec" hidden><summary>★ Saved stories <span id="savedCount"></span></summary><div id="savedGroups" class="groups"></div></details>
   <details class="list fold" id="lib" hidden><summary>Recent stories <span id="libCount"></span></summary><ul id="libList"></ul></details>
+</div>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Photo">
+  <button class="iconbtn lb-close" id="lbClose" type="button" aria-label="Close photo">✕</button>
+  <img id="lbImg" alt="">
+  <p id="lbCap"></p>
+  <div class="lbnav" id="lbNav"><button class="small" id="lbPrev" type="button" aria-label="Previous photo">‹</button><span id="lbCount"></span><button class="small" id="lbNext" type="button" aria-label="Next photo">›</button></div>
 </div>
 
 <button class="mini" id="mini" type="button" aria-label="Pause reading" hidden>❚❚</button>
@@ -468,6 +493,15 @@ function showCard(c){
   el("desc").textContent = c.desc ? c.desc.charAt(0).toUpperCase() + c.desc.slice(1) : "";
   el("desc").hidden = !c.desc;
   el("lede").textContent = firstSentences(c.extract || "", 3);
+  showHero(c);
+  loadPhotos(c);
+  el("read").hidden = openingTitle === c.title;
+  updateSaveButtons();
+  const prev = backStack[backStack.length - 1];
+  el("back").hidden = !prev;
+  if(prev) el("backTitle").textContent = prev.item.title;
+}
+function showHero(c){
   const hero = el("hero"), box = el("heroBox");
   hero.classList.remove("loaded"); box.classList.remove("done");
   if(c.thumb){
@@ -476,11 +510,6 @@ function showCard(c){
     hero.src = c.thumb; hero.alt = c.title; box.hidden = false;
     if(hero.complete && hero.naturalWidth) shown();
   } else { hero.removeAttribute("src"); box.hidden = true; }
-  el("read").hidden = openingTitle === c.title;
-  updateSaveButtons();
-  const prev = backStack[backStack.length - 1];
-  el("back").hidden = !prev;
-  if(prev) el("backTitle").textContent = prev.item.title;
 }
 
 let openingTitle = "";
@@ -525,7 +554,99 @@ function prefetch(){
   }).catch(() => {}).finally(() => { prefetchJob = null; });
   return prefetchJob;
 }
-function warm(){ state.queue.items.slice(0, 2).forEach(c => { if(c.thumb){ const i = new Image(); i.src = c.thumb; } }); }
+function warm(){ state.queue.items.slice(0, 2).forEach(c => { if(c.thumb){ const i = new Image(); i.src = c.thumb; } media(c.title); }); }
+
+/* ---------- photos from the article (shown on the card before reading) ---------- */
+const mediaCache = new Map();
+const sized = (src, px) => { let u = src.startsWith("//") ? "https:" + src : src; return u.replace(/\/(\d+)px-/, (m, n) => +n < px ? "/" + px + "px-" : m); };
+function media(title){
+  if(mediaCache.has(title)) return mediaCache.get(title);
+  const job = fetch("https://en.wikipedia.org/api/rest_v1/page/media-list/" + encodeURIComponent(title.replace(/ /g, "_")))
+    .then(r => r.ok ? r.json() : {items: []})
+    .then(j => {
+      const seen = new Set();
+      return (j.items || []).filter(i => i.type === "image" && i.showInGallery !== false && i.srcset && i.srcset.length
+        && !/\.svg$/i.test(i.title || "") && !/(Flag_of|Question_book|Commons-logo|Wiki_letter|Ambox|Symbol_|Edit-clear|Location_map|locator)/i.test(i.title || ""))
+        .filter(i => !seen.has(i.title) && seen.add(i.title))
+        .map(i => {
+          const src = i.srcset[i.srcset.length - 1].src;
+          return {file: i.title, thumb: sized(src, 330), big: sized(src, 960), cap: (i.caption && i.caption.text) || ""};
+        });
+    })
+    .catch(() => []);
+  mediaCache.set(title, job);
+  return job;
+}
+let stripToken = 0, gallery = [];
+async function loadPhotos(c){
+  const token = ++stripToken;
+  const strip = el("strip"); strip.innerHTML = ""; strip.hidden = true; gallery = [];
+  const pics = await media(c.title);
+  if(token !== stripToken || !state.current || state.current.title !== c.title) return;
+  const heroFile = c.thumb ? decodeURIComponent((c.thumb.match(/\/([^\/]+?)(\?|$)/) || [,""])[1]).replace(/^\d+px-/, "") : "";
+  gallery = pics.slice();
+  // no main photo tagged on Wikipedia: use the first picture from the article
+  if(!c.thumb && gallery.length){
+    c.thumb = gallery[0].big; showHero(c);
+    const r = state.library.find(x => x.title === c.title); if(r) r.thumb = c.thumb;
+    save(); renderLib();
+  } else if(c.thumb){
+    gallery.unshift({file: "lead", thumb: c.thumb, big: sized(c.thumb, 960), cap: ""});
+  }
+  // the strip shows the next few pictures after the main one
+  const extra = gallery.slice(1).filter(p => !heroFile || !p.file.replace(/^File:/, "").replace(/ /g, "_").includes(heroFile.slice(0, 20))).slice(0, 4);
+  if(!extra.length) return;
+  extra.forEach((p, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.style.setProperty("--i", i);
+    b.setAttribute("aria-label", p.cap ? "Photo: " + p.cap : "Photo " + (i + 2));
+    const img = document.createElement("img"); img.alt = p.cap || ""; img.loading = "lazy";
+    img.onload = () => img.classList.add("loaded"); img.onerror = () => b.remove();
+    img.src = p.thumb; b.append(img);
+    b.addEventListener("click", () => openLightbox(gallery.indexOf(p)));
+    strip.append(b);
+  });
+  strip.hidden = false;
+}
+
+/* ---------- full-size photo viewer ---------- */
+let lbIndex = 0, lbList = [];
+function showLb(){
+  const p = lbList[lbIndex]; if(!p) return;
+  const img = el("lbImg"); img.src = p.big; img.alt = p.cap || "";
+  img.onerror = () => { img.onerror = null; img.src = p.thumb; };
+  el("lbCap").textContent = p.cap || "";
+  el("lbNav").hidden = lbList.length < 2;
+  el("lbCount").textContent = (lbIndex + 1) + " / " + lbList.length;
+}
+function openLightbox(i, list){
+  lbList = list || gallery; lbIndex = Math.max(0, i); if(!lbList.length) return;
+  showLb(); el("lightbox").hidden = false;
+  try{ history.pushState({nfPhoto: 1}, ""); }catch(e){}
+}
+function closeLightbox(fromHistory){
+  if(el("lightbox").hidden) return;
+  el("lightbox").hidden = true; el("lbImg").removeAttribute("src");
+  if(!fromHistory && history.state && history.state.nfPhoto) history.back();
+}
+el("lbClose").addEventListener("click", () => closeLightbox());
+el("lightbox").addEventListener("click", ev => { if(ev.target === el("lightbox")) closeLightbox(); });
+el("lbPrev").addEventListener("click", () => { lbIndex = (lbIndex - 1 + lbList.length) % lbList.length; showLb(); });
+el("lbNext").addEventListener("click", () => { lbIndex = (lbIndex + 1) % lbList.length; showLb(); });
+document.addEventListener("keydown", ev => {
+  if(el("lightbox").hidden) return;
+  if(ev.key === "Escape") closeLightbox();
+  if(ev.key === "ArrowRight") el("lbNext").click();
+  if(ev.key === "ArrowLeft") el("lbPrev").click();
+});
+// swipe left/right in the viewer
+let lbX = null;
+el("lightbox").addEventListener("touchstart", ev => { lbX = ev.touches[0].clientX; }, {passive:true});
+el("lightbox").addEventListener("touchend", ev => {
+  if(lbX === null || lbList.length < 2) return;
+  const dx = ev.changedTouches[0].clientX - lbX; lbX = null;
+  if(Math.abs(dx) > 50) (dx < 0 ? el("lbNext") : el("lbPrev")).click();
+}, {passive:true});
+el("heroBox").addEventListener("click", () => { if(gallery.length) openLightbox(0); else if(state.current && state.current.thumb) openLightbox(0, [{thumb: state.current.thumb, big: sized(state.current.thumb, 960), cap: ""}]); });
 
 // Older saved/recent entries may be missing a photo; look them up once.
 async function backfillThumbs(){
@@ -608,6 +729,8 @@ function renderLib(){
 
 /* ---------- saved stories, grouped by type ---------- */
 if(!Array.isArray(state.saved)) state.saved = [];
+// stories lined up before the photo fix may lack pictures: start the line-up fresh once
+if(!state.photosV2){ state.queue = {key:"", items:[]}; state.photosV2 = true; save(); }
 const isSaved = t => state.saved.some(x => x.title === t);
 function groupOf(c){ return CATS[Object.keys(CATS).find(k => CATS[k].label === c.cat)] ? c.cat : "Other stories"; }
 function toggleSave(){
@@ -890,6 +1013,12 @@ function buildToc(){
 
 // links inside an article open that article here
 el("article").addEventListener("click", ev => {
+  const im = ev.target.closest("img");
+  if(im && !ev.target.closest("a[data-wiki]")){
+    const imgs = [...el("article").querySelectorAll("img")];
+    const list = imgs.map(x => { const f = x.closest("figure"); return {thumb: x.currentSrc || x.src, big: sized(x.currentSrc || x.src, 960), cap: f && f.querySelector("figcaption") ? f.querySelector("figcaption").textContent : ""}; });
+    ev.preventDefault(); openLightbox(imgs.indexOf(im), list); return;
+  }
   const a = ev.target.closest("a[data-wiki]");
   if(!a) return;
   ev.preventDefault();
@@ -922,7 +1051,7 @@ el("back").addEventListener("click", () => {
   // use the browser history so the phone's back gesture stays in step
   if(history.state && history.state.nfBack) history.back(); else goBack();
 });
-addEventListener("popstate", () => { if(backStack.length) goBack(); });
+addEventListener("popstate", () => { if(!el("lightbox").hidden){ closeLightbox(true); return; } if(backStack.length) goBack(); });
 
 // remember reading position
 let progT = 0;
