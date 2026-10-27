@@ -568,9 +568,10 @@ function sanitize(html){
     const w = +img.getAttribute("width") || 0;
     let s = img.getAttribute("src") || img.getAttribute("data-src") || "";
     if(s.startsWith("//")) s = "https:" + s;
+    const orig = s;
     if(!/^https:\/\/(upload|thumb|maps)\.wikimedia\.org\//.test(s) || (w && w < 50) || /Question_book|Edit-clear|Ambox|Wiki_letter|Symbol_/i.test(s)){ img.remove(); return; }
-    s = s.replace(/\/(\d+)px-/, (m, n) => +n < 640 ? "/640px-" : m);
-    img.setAttribute("src", s); img.setAttribute("loading", "lazy");
+    s = s.replace(/\/(\d+)px-/, (m, n) => +n < 500 ? "/960px-" : m); // Wikimedia only serves standard sizes (250, 330, 500, 960…)
+    img.setAttribute("data-orig", orig); img.setAttribute("src", s); img.setAttribute("loading", "lazy");
   });
   body.querySelectorAll("a").forEach(a => {
     const href = a.getAttribute("href") || "";
@@ -589,7 +590,7 @@ function sanitize(html){
       if(k === "class"){
         const keep = n.className.split(/\s+/).filter(c => KEEP_CLASS.includes(c));
         keep.length ? n.setAttribute("class", keep.join(" ")) : n.removeAttribute("class");
-      } else if(!["href","src","alt","data-wiki","colspan","rowspan","loading","target","rel"].includes(k)) n.removeAttribute(k);
+      } else if(!["href","src","alt","data-wiki","data-orig","colspan","rowspan","loading","target","rel"].includes(k)) n.removeAttribute(k);
     });
   });
   body.querySelectorAll("table").forEach(t => {
@@ -619,7 +620,7 @@ async function openArticle(title, restore){
     art.replaceChildren(...[...body.childNodes].map(n => document.importNode(n, true)));
     [...art.children].slice(0, 14).forEach((n, i) => n.style.setProperty("--i", i));
     void art.offsetWidth; art.classList.add("enter");
-    art.querySelectorAll("img").forEach(img => { if(img.complete && img.naturalWidth) img.classList.add("loaded"); else img.addEventListener("load", () => img.classList.add("loaded"), {once:true}); img.addEventListener("error", () => img.remove(), {once:true}); });
+    art.querySelectorAll("img").forEach(img => { if(img.complete && img.naturalWidth) img.classList.add("loaded"); else img.addEventListener("load", () => img.classList.add("loaded"), {once:true}); img.addEventListener("error", () => { const o = img.dataset.orig; if(o && img.src !== o){ img.src = o; } else img.remove(); }); });
     const firstP = [...art.querySelectorAll("p")].find(p => !p.closest(".infobox-wrap,.tablewrap,figure") && p.textContent.trim().length > 60);
     if(firstP) firstP.classList.add("lead");
     buildToc();
