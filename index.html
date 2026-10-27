@@ -31,7 +31,7 @@ body{font-family:var(--f-body);font-size:var(--size);line-height:1.65;
   padding-left:max(16px, env(safe-area-inset-left, 0px));
   padding-right:max(16px, env(safe-area-inset-right, 0px));
   padding-top:calc(20px + env(safe-area-inset-top, 0px));
-  padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));
+  padding-bottom:calc(84px + env(safe-area-inset-bottom, 0px));
   background:radial-gradient(120% 60% at 50% -10%, var(--glow) 0%, var(--ink) 55%, var(--deep) 100%) fixed, var(--ink);}
 img{max-width:100%;height:auto}
 html{scroll-behavior:smooth}
@@ -142,13 +142,18 @@ button[disabled]{opacity:.35;cursor:default}
 .list .s{font-size:14px;color:var(--dim);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .lib{border-top:1px solid var(--rule);padding-top:18px}
 
-/* Listen bar */
-.player{position:fixed;left:0;right:0;bottom:0;z-index:20;animation:lift .45s var(--ease) both;background:color-mix(in srgb,var(--folder) 96%,transparent);border-top:1px solid var(--rule);backdrop-filter:blur(8px);
-  padding:10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
-.player .in{max-width:660px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.player select{font-family:var(--f-mono);font-size:12px;background:var(--ink);color:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:8px 6px;max-width:100%}
-.player #voice{flex:1;min-width:120px}
-.player .left{font-family:var(--f-mono);font-size:11px;color:var(--dim);letter-spacing:.06em}
+/* Listen controls: live at the top of each story, settings fold away */
+.listen{display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,var(--folder-hi),var(--folder));border:1px solid var(--rule);border-radius:6px;padding:12px 14px;animation:rise .45s var(--ease) both}
+.lrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.lrow .left{font-family:var(--f-mono);font-size:11px;color:var(--dim);letter-spacing:.06em}
+.lsettings{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;border-top:1px dashed var(--rule);padding-top:10px;animation:drop .3s var(--ease) both}
+.lsettings label{display:flex;flex-direction:column;gap:4px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);min-width:0}
+.lsettings select{font-family:var(--f-mono);font-size:13px;background:var(--ink);color:var(--paper);border:1px solid var(--rule);border-radius:3px;padding:8px 6px;width:100%}
+.mini{position:fixed;right:calc(16px + env(safe-area-inset-right, 0px));bottom:calc(16px + env(safe-area-inset-bottom, 0px));z-index:20;width:52px;height:52px;padding:0;justify-content:center;border-radius:50%;
+  background:linear-gradient(180deg,#e0b450,var(--lamp));border-color:var(--lamp);color:#22180b;font-size:18px;box-shadow:0 10px 24px -8px #000;animation:rise .35s var(--ease) both}
+.back{all:unset;cursor:pointer;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:var(--lamp);display:inline-flex;gap:6px;align-items:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 0}
+.back:hover{text-decoration:underline}
+.back:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}.file .hero,#article img{opacity:1;transform:none}}
 </style>
 </head>
@@ -180,6 +185,7 @@ button[disabled]{opacity:.35;cursor:default}
     <div id="card" hidden>
       <img class="hero" id="hero" alt="" hidden>
       <div class="body">
+        <button class="back" id="back" type="button" hidden>← Back to <span id="backTitle"></span></button>
         <div class="meta"><span class="tag" id="cat"></span><span id="mins"></span></div>
         <h1 id="title"></h1>
         <p class="desc" id="desc"></p>
@@ -192,6 +198,24 @@ button[disabled]{opacity:.35;cursor:default}
     </div>
   </section>
 
+  <div class="listen" id="listen" hidden>
+    <div class="lrow">
+      <button class="primary" id="play" type="button">▶ Listen</button>
+      <button id="stopL" type="button" hidden>■ Stop</button>
+      <button class="more" id="lset" type="button" aria-expanded="false" aria-controls="lsettings">Voice settings ▾</button>
+      <span class="left" id="left"></span>
+    </div>
+    <div class="lsettings" id="lsettings" hidden>
+      <label>Voice<select id="voice"></select></label>
+      <label>Speed<select id="rate">
+        <option value="0.8">0.8×</option><option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.1">1.1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+      </select></label>
+      <label>Sleep timer<select id="sleep">
+        <option value="0">No timer</option><option value="15">Stop in 15 min</option><option value="30">Stop in 30 min</option><option value="45">Stop in 45 min</option><option value="60">Stop in 60 min</option>
+      </select></label>
+    </div>
+  </div>
+
   <nav class="toc" id="toc" aria-label="Contents" hidden></nav>
   <article id="article"></article>
   <div class="credit" id="credit" hidden></div>
@@ -200,19 +224,7 @@ button[disabled]{opacity:.35;cursor:default}
   <section class="list lib" id="lib" hidden><h3>Stories you've opened</h3><ul id="libList"></ul></section>
 </div>
 
-<div class="player" id="player" hidden>
-  <div class="in">
-    <button class="primary" id="play" type="button">▶ Listen</button>
-    <select id="voice" aria-label="Voice"></select>
-    <select id="rate" aria-label="Speed">
-      <option value="0.8">0.8×</option><option value="0.9">0.9×</option><option value="1" selected>1×</option><option value="1.1">1.1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
-    </select>
-    <select id="sleep" aria-label="Sleep timer">
-      <option value="0">No timer</option><option value="15">Stop in 15 min</option><option value="30">Stop in 30 min</option><option value="45">Stop in 45 min</option><option value="60">Stop in 60 min</option>
-    </select>
-    <span class="left" id="left"></span>
-  </div>
-</div>
+<button class="mini" id="mini" type="button" aria-label="Pause reading" hidden>❚❚</button>
 
 <script>
 "use strict";
@@ -396,12 +408,18 @@ function showCard(c){
   if(c.thumb){ hero.onload = () => hero.classList.add("loaded"); hero.src = c.thumb; hero.alt = c.title; hero.hidden = false; if(hero.complete && hero.naturalWidth) hero.classList.add("loaded"); }
   else { hero.removeAttribute("src"); hero.hidden = true; }
   el("read").hidden = openingTitle === c.title;
+  const prev = backStack[backStack.length - 1];
+  el("back").hidden = !prev;
+  if(prev) el("backTitle").textContent = prev.item.title;
 }
 
 let openingTitle = "";
-function clearArticle(){ openingTitle = ""; stopListen(); el("article").innerHTML = ""; el("toc").hidden = true; el("credit").hidden = true; el("after").hidden = true; el("player").hidden = true; }
+function clearArticle(){ openingTitle = ""; stopListen(); el("article").innerHTML = ""; el("toc").hidden = true; el("credit").hidden = true; el("after").hidden = true; el("listen").hidden = true; el("lsettings").hidden = true; el("lset").setAttribute("aria-expanded","false"); el("lset").textContent = "Voice settings ▾"; }
 
-function present(c){
+// Stories you came from by tapping links, newest last.
+let backStack = [];
+function present(c, keepBack){
+  if(!keepBack) backStack = [];
   state.current = c;
   if(!isSeen(c.title)) state.seen.push(c.title);
   state.seen = state.seen.slice(-400);
@@ -608,7 +626,7 @@ function sanitize(html){
 }
 
 let openToken = 0;
-async function openArticle(title, restore){
+async function openArticle(title, restore, y){
   const token = ++openToken;
   clearArticle();
   openingTitle = title;
@@ -650,7 +668,9 @@ async function openArticle(title, restore){
       save(); renderLib();
     }
     setupPlayer();
-    if(restore && state.progress[title]){
+    if(typeof y === "number"){
+      requestAnimationFrame(() => window.scrollTo({top: y}));
+    } else if(restore && state.progress[title]){
       requestAnimationFrame(() => {
         const top = art.offsetTop, h = art.offsetHeight;
         window.scrollTo({top: top + h * state.progress[title] - 80});
@@ -691,13 +711,31 @@ el("article").addEventListener("click", ev => {
 });
 
 async function openLinked(title){
-  window.scrollTo({top:0});
+  const from = state.current ? {item: state.current, y: scrollY, open: el("article").childNodes.length > 0} : null;
   let d = null;
   try{ d = (await details([title]))[0]; }catch(e){}
   const item = Object.assign({title, extract:"", desc:"", thumb:""}, d || {}, {cat:"Linked story"});
-  present(item);
+  if(from){ backStack.push(from); try{ history.pushState({nfBack: backStack.length}, ""); }catch(e){} }
+  window.scrollTo({top:0});
+  present(item, true);
   openArticle(item.title);
 }
+
+// Return to the story you were reading before tapping a link, at the same spot.
+function goBack(){
+  const prev = backStack.pop();
+  if(!prev) return false;
+  present(prev.item, true);
+  if(prev.open) openArticle(prev.item.title, false, prev.y);
+  else window.scrollTo({top:0});
+  return true;
+}
+el("back").addEventListener("click", () => {
+  if(!backStack.length) return;
+  // use the browser history so the phone's back gesture stays in step
+  if(history.state && history.state.nfBack) history.back(); else goBack();
+});
+addEventListener("popstate", () => { if(backStack.length) goBack(); });
 
 // remember reading position
 let progT = 0;
@@ -729,7 +767,7 @@ function loadVoices(){
 if(synth){ loadVoices(); synth.addEventListener?.("voiceschanged", loadVoices); synth.onvoiceschanged = loadVoices; }
 
 function setupPlayer(){
-  el("player").hidden = !synth || !el("article").childNodes.length;
+  el("listen").hidden = !synth || !el("article").childNodes.length;
   el("rate").value = state.rate || "1";
   updatePlay();
 }
@@ -774,7 +812,15 @@ function startListen(){
 }
 function pauseListen(){ tts.on = false; synth && synth.cancel(); updatePlay(); }
 function stopListen(){ tts.on = false; if(synth) synth.cancel(); tts.cur = null; mark(null); clearTimeout(tts.timer); clearInterval(tts.tick); tts.endAt = 0; el("left").textContent = ""; updatePlay(); }
-function updatePlay(){ el("play").textContent = tts.on ? "❚❚ Pause" : (tts.cur ? "▶ Resume" : "▶ Listen"); }
+function updatePlay(){
+  el("play").textContent = tts.on ? "❚❚ Pause" : (tts.cur ? "▶ Resume" : "▶ Listen");
+  el("stopL").hidden = !tts.cur;
+  // small floating button only while a story is being read (or paused mid-way)
+  const mini = el("mini");
+  mini.hidden = !tts.cur;
+  mini.textContent = tts.on ? "❚❚" : "▶";
+  mini.setAttribute("aria-label", tts.on ? "Pause reading" : "Resume reading");
+}
 function armSleep(){
   clearTimeout(tts.timer); clearInterval(tts.tick);
   const m = +el("sleep").value;
@@ -785,6 +831,14 @@ function armSleep(){
   show(); tts.tick = setInterval(show, 30000);
 }
 el("play").addEventListener("click", () => tts.on ? pauseListen() : startListen());
+el("mini").addEventListener("click", () => tts.on ? pauseListen() : startListen());
+el("stopL").addEventListener("click", () => stopListen());
+el("lset").addEventListener("click", () => {
+  const open = el("lsettings").hidden;
+  el("lsettings").hidden = !open;
+  el("lset").setAttribute("aria-expanded", String(open));
+  el("lset").textContent = open ? "Hide settings ▴" : "Voice settings ▾";
+});
 el("voice").addEventListener("change", () => { state.voice = el("voice").value; save(); if(tts.on) startListen(); });
 el("rate").addEventListener("change", () => { state.rate = el("rate").value; save(); if(tts.on) startListen(); });
 el("sleep").addEventListener("change", () => { if(tts.on) armSleep(); });
