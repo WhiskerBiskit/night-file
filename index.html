@@ -6,6 +6,10 @@
 <title>Night File</title>
 <meta name="description" content="Dark true stories from Wikipedia, for reading before bed.">
 <meta name="theme-color" content="#0f1c15">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Night File">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -483,6 +487,101 @@ button.primary:active,.iconbtn:active,button.small:active,.ctx:active,.bback:act
 @keyframes flicker{0%,100%{transform:scale(1,1) skewX(0)}25%{transform:scale(.94,1.06) skewX(2deg)}50%{transform:scale(1.04,.95) skewX(-2deg)}75%{transform:scale(.97,1.04) skewX(1deg)}}
 @keyframes halo{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.07)}}
 .loader .sk-text{font-family:var(--f-ui);font-size:15px;letter-spacing:.06em;color:var(--soft);font-style:normal}
+/* ================= refinement ================= */
+/* typography */
+body{font-variant-numeric:lining-nums;font-kerning:normal;hanging-punctuation:first}
+p,.lede,.desc,#article li{text-wrap:pretty}
+h1{letter-spacing:-.005em}
+/* warm photo treatment: every picture shares the same lamplit tone */
+.heroBox{position:relative}
+.file .hero{filter:sepia(.22) saturate(.78) contrast(1.06) brightness(.9)}
+.heroBox::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(10,8,5,.18) 0%,transparent 28%,transparent 58%,rgba(42,32,24,.92) 100%),radial-gradient(120% 90% at 50% 30%,rgba(230,160,70,.10),transparent 70%)}
+.strip img,.list .th:not(.ph),#article figure img,#article .infobox-wrap img,#article ul.gallery img{filter:sepia(.18) saturate(.82) contrast(1.04) brightness(.94)}
+/* case-file banner for stories without a photo */
+.heroBox.nophoto{height:clamp(150px,40vw,210px);cursor:default;animation:none;
+  background:repeating-linear-gradient(135deg,rgba(255,235,200,.025) 0 2px,transparent 2px 12px),radial-gradient(90% 120% at 50% 0%,#1f3326,var(--deep))}
+.heroBox.nophoto .hero{display:none}
+.banner{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.banner .sicon{width:64px;height:64px;box-shadow:0 0 30px rgba(230,170,80,.18),inset 0 0 0 4px rgba(10,16,12,.6)}
+.banner .sicon svg{width:28px;height:28px}
+.banner .lbl{font-family:var(--f-ui);font-size:13px;letter-spacing:.32em;color:var(--soft);padding-left:.32em}
+.banner .lbl b{color:var(--lamp);font-weight:500}
+.banner .stamp{position:absolute;right:16px;top:14px;transform:rotate(8deg);font-family:var(--f-ui);font-weight:700;font-size:12px;letter-spacing:.2em;
+  color:rgba(208,128,94,.55);border:2px solid rgba(208,128,94,.45);border-radius:4px;padding:3px 8px 2px}
+/* case number, inked category stamp, tidy meta row */
+.meta{gap:6px 14px}
+.tag{border:1.5px solid color-mix(in srgb,var(--lamp) 75%,transparent);outline:1px solid color-mix(in srgb,var(--lamp) 30%,transparent);outline-offset:2px;
+  border-radius:3px;padding:2px 9px 1px;font-weight:700;font-size:13px;letter-spacing:.1em;transform:rotate(-1.2deg);margin:2px 4px 2px 2px;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='40'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='40'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1.6 1.55'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.meta .mi{display:inline-flex;align-items:center;gap:5px;color:var(--soft)}
+.meta .mi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.heroBox .caseno{position:absolute;right:16px;bottom:12px;z-index:2;font-family:var(--f-ui);font-size:13px;letter-spacing:.16em;color:rgba(237,228,207,.7);text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.heroBox .caseno b{color:var(--brass-hi);font-weight:500}
+.heroBox.nophoto .caseno{display:none}
+/* article: book-like opening and ornamented headings */
+#article p.lead::first-letter{font-family:var(--f-display);font-weight:700;font-size:3.9em;line-height:.8;padding:7px 10px 0 0;color:var(--brass-hi);text-shadow:0 0 18px rgba(240,190,90,.35),0 2px 0 rgba(0,0,0,.4)}
+#article h2{font-family:var(--f-head);font-weight:600;font-size:28px;letter-spacing:.02em;border-bottom:0;padding-bottom:10px;
+  background:linear-gradient(90deg,var(--brass),rgba(201,154,69,.15) 70%,transparent) left bottom/100% 1px no-repeat;display:flex;align-items:baseline;gap:10px}
+#article h2::before{content:"◆";font-size:11px;color:var(--lamp);transform:translateY(-4px);flex:none}
+#article h3{font-family:var(--f-head);font-weight:600;font-size:22px;letter-spacing:.02em}
+#article h4{font-family:var(--f-ui);font-size:15px;letter-spacing:.06em;text-transform:none;color:var(--soft)}
+.endmark{display:flex;align-items:center;gap:12px;color:var(--brass);font-family:var(--f-ui);font-size:13px;letter-spacing:.3em;margin:10px 0 4px}
+.endmark::before,.endmark::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--brass))}
+.endmark::after{background:linear-gradient(90deg,var(--brass),transparent)}
+/* dossier-style case details */
+#article .infobox-wrap{position:relative;border:1px solid color-mix(in srgb,var(--brass) 38%,var(--rule));border-radius:var(--r);padding:30px 4px 6px;
+  background:repeating-linear-gradient(92deg,rgba(255,235,200,.014) 0 2px,transparent 2px 9px),linear-gradient(180deg,var(--folder-hi),var(--folder));
+  box-shadow:inset 0 1px 0 rgba(255,226,170,.12),0 16px 34px -22px #000}
+#article .infobox-wrap::before{content:"Case details";position:absolute;left:16px;top:9px;font-family:var(--f-ui);font-size:13px;letter-spacing:.14em;color:var(--lamp)}
+#article .infobox-wrap::after{content:"◆";position:absolute;right:16px;top:9px;font-size:10px;color:var(--brass)}
+#article .infobox-wrap table{font-size:15px;border-collapse:separate;border-spacing:0}
+#article .infobox-wrap caption,#article .infobox-wrap tr:first-child > th[colspan]{font-family:var(--f-head);font-weight:600;font-size:21px;line-height:1.2;color:var(--paper);text-transform:none;letter-spacing:.01em;padding:4px 12px 10px;text-align:left}
+#article .infobox-wrap th{font-family:var(--f-ui);font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:none;color:var(--soft);width:36%;padding:8px 10px 8px 12px}
+#article .infobox-wrap td{padding:8px 12px 8px 4px;color:var(--paper)}
+#article .infobox-wrap th,#article .infobox-wrap td{border-bottom:1px dashed color-mix(in srgb,var(--rule) 80%,transparent)}
+#article .infobox-wrap tr:last-child > *{border-bottom:0}
+#article .infobox-wrap td[colspan],#article .infobox-wrap th[colspan]{text-align:center}
+#article .infobox-wrap img{border-radius:6px;margin:4px auto}
+#article .tablewrap{border:0;border-radius:var(--r);background:color-mix(in srgb,var(--folder) 60%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rule) 60%,transparent)}
+#article th,#article td{border-bottom-color:color-mix(in srgb,var(--rule) 65%,transparent)}
+/* brass reading progress */
+.progress{position:fixed;left:0;right:0;top:0;height:2px;z-index:45;pointer-events:none;transform-origin:left;transform:scaleX(0);opacity:0;
+  background:linear-gradient(90deg,var(--brass),var(--brass-hi));box-shadow:0 0 8px rgba(240,200,110,.6);transition:opacity .3s}
+.progress.on{opacity:1}
+/* tab bar steps aside while you read */
+.tabbar{transition:transform .38s cubic-bezier(.3,.7,.2,1)}
+.tabbar.away{transform:translateY(105%)}
+body.tabs-away .mini{bottom:calc(18px + env(safe-area-inset-bottom, 0px)) !important}
+.mini{transition:bottom .38s cubic-bezier(.3,.7,.2,1)}
+/* fewer lines: soft shadows instead of borders */
+.ctx{border-color:transparent;background:linear-gradient(180deg,color-mix(in srgb,var(--folder-hi) 85%,transparent),color-mix(in srgb,var(--folder) 85%,transparent))}
+.block{border-color:color-mix(in srgb,var(--brass) 16%,var(--rule))}
+.list li{border-bottom-color:color-mix(in srgb,var(--rule) 55%,transparent)}
+/* saved list: bigger warm thumbnails, ornamented groups, swipe to remove */
+.list li .pick{grid-template-columns:72px 1fr;gap:14px;padding:12px 0}
+.list .th{width:72px;height:72px;border-radius:8px;border:0;box-shadow:0 0 0 1px rgba(201,154,69,.25),0 6px 14px -8px #000}
+.groups details{border:0;border-radius:var(--r);background:color-mix(in srgb,var(--folder) 55%,transparent);box-shadow:inset 0 1px 0 rgba(255,226,170,.06)}
+.groups summary{font-family:var(--f-head);font-weight:600;font-size:20px}
+.groups summary::before{content:"◆";font-size:9px;color:var(--lamp);margin-right:10px;transform:translateY(-3px)}
+.groups summary{justify-content:flex-start}
+.groups summary span{margin-left:auto;font-family:var(--f-ui);font-size:13px;letter-spacing:.05em;color:var(--soft)}
+.groups details[open] summary{border-bottom:1px solid color-mix(in srgb,var(--rule) 55%,transparent)}
+.list li.swipe{position:relative;overflow:hidden;touch-action:pan-y;max-height:160px}
+.list li.swipe .del{position:absolute;right:0;top:0;bottom:0;display:flex;align-items:center;padding:0 18px;font-family:var(--f-ui);font-size:15px;color:#fff3e8;
+  background:linear-gradient(90deg,transparent,rgba(160,70,45,.9) 40%);opacity:0;transition:opacity .2s}
+.list li.swipe .pick,.list li.swipe .rm{position:relative;z-index:1;background:transparent;transition:transform .3s var(--ease)}
+.list li.swipe.dragging .pick,.list li.swipe.dragging .rm{transition:none}
+.list li.gone{animation:collapse .35s var(--ease) forwards}
+@keyframes collapse{to{opacity:0;transform:translateX(-40%);max-height:0;padding:0;margin:0;border:0}}
+/* iPhone install hint */
+.ioshint{position:fixed;left:12px;right:12px;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:42;margin:0 auto;max-width:440px;display:flex;align-items:center;gap:12px;
+  padding:12px 12px 12px 14px;border-radius:var(--r-lg);border:1px solid var(--brass);background:rgba(36,27,19,.98);box-shadow:0 18px 40px -16px #000;
+  font-size:15px;line-height:1.4;color:var(--paper);animation:fadeUp .45s var(--ease) both}
+.ioshint img{width:44px;height:44px;border-radius:10px;flex:none}
+.ioshint b{display:block;font-family:var(--f-head);font-weight:600;font-size:18px;color:var(--lamp)}
+.ioshint svg{width:16px;height:16px;vertical-align:-3px;stroke:var(--lamp);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ioshint .x{all:unset;cursor:pointer;flex:none;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;color:var(--soft);font-size:15px;align-self:flex-start}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}.file .hero,#article img{opacity:1;transform:none}}
 </style>
 </head>
@@ -511,11 +610,11 @@ button.primary:active,.iconbtn:active,button.small:active,.ctx:active,.bback:act
     <p class="msg" id="msg" hidden></p>
     <button class="small" id="widen" type="button" hidden>Widen to any era</button>
     <div id="card" hidden>
-      <div class="heroBox" id="heroBox" hidden><img class="hero" id="hero" alt=""></div>
+      <div class="heroBox" id="heroBox" hidden><img class="hero" id="hero" alt=""><span class="caseno" id="caseno"></span></div>
       <div class="strip" id="strip" hidden aria-label="Photos from this story"></div>
       <div class="body">
         <button class="back" id="back" type="button" hidden>← Back to <span id="backTitle"></span></button>
-        <div class="meta"><span class="tag" id="cat"></span><span id="mins"></span></div>
+        <div class="meta"><span class="tag" id="cat"></span><span class="mi" id="mins"></span><span class="mi" id="year"></span></div>
         <h1 id="title"></h1>
         <p class="desc" id="desc"></p>
         <p class="lede" id="lede"></p>
@@ -582,6 +681,7 @@ button.primary:active,.iconbtn:active,button.small:active,.ctx:active,.bback:act
 </div>
 
 <div class="splash" id="splash" aria-hidden="true"><div class="sp"><div class="rules"><i></i><b>◆</b><i></i></div><div class="nm">Night <i>·</i> File</div><div class="sb">CASE FILES · AFTER DARK</div></div></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <nav class="tabbar" aria-label="Sections">
   <div class="in">
@@ -786,7 +886,7 @@ async function batch(){
       const top = shuffle(pool.sort((a,b) => b.size - a.size).slice(0, 30)).slice(0, 20).map(r => r.title);
       let items = (await details(top)).filter(d => !BLOCK.test(d.title) && !isSeen(d.title) && !NOT_A_STORY.test(d.desc));
       items = items.filter(d => eraOK(d.extract));
-      if(items.length) return shuffle(items).map(d => Object.assign(d, {cat:cat.label, words:words[d.title] || 0}));
+      if(items.length){ const mixed = shuffle(items); return [...mixed.filter(d => d.thumb), ...mixed.filter(d => !d.thumb)].map(d => Object.assign(d, {cat:cat.label, words:words[d.title] || 0})); }
     }
   }
   return [];
@@ -816,15 +916,30 @@ function firstSentences(t, n){
   return out.join(" ");
 }
 const mins = w => w ? Math.max(1, Math.round(w/230)) + " min read" : "";
+function setMins(t){ el("mins").innerHTML = t ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>' + t : ""; }
+function caseNo(t){ let h = 7; for(const ch of t) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return String(1000 + h % 9000); }
+// curly quotes and proper dashes
+function smart(t){
+  return t.replace(/(^|[\s(\[{\u2014\u2013-])"/g, "$1\u201c").replace(/"/g, "\u201d")
+          .replace(/(^|[\s(\[{\u2014\u2013-])'/g, "$1\u2018").replace(/'/g, "\u2019")
+          .replace(/ -- | --|-- /g, "\u2009\u2014\u2009").replace(/--/g, "\u2014").replace(/ - /g, " \u2013 ");
+}
+function smartNodes(root){
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode: n => n.parentNode.closest("code,pre,script,style") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT});
+  let n; while((n = w.nextNode())) if(/["']|--| - /.test(n.nodeValue)) n.nodeValue = smart(n.nodeValue);
+}
 
 function showCard(c){
   el("card").hidden = false;
   el("cat").textContent = c.cat || "Wikipedia";
-  el("mins").textContent = mins(c.words);
+  setMins(mins(c.words));
+  const yr = storyYear(c.extract || "");
+  el("year").innerHTML = yr ? '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>' + yr : "";
+  el("caseno").innerHTML = "No. <b>" + caseNo(c.title) + "</b>";
   el("title").textContent = c.title;
-  el("desc").textContent = c.desc ? c.desc.charAt(0).toUpperCase() + c.desc.slice(1) : "";
+  el("desc").textContent = c.desc ? smart(c.desc.charAt(0).toUpperCase() + c.desc.slice(1)) : "";
   el("desc").hidden = !c.desc;
-  el("lede").textContent = firstSentences(c.extract || "", 3);
+  el("lede").textContent = smart(firstSentences(c.extract || "", 3));
   showHero(c);
   loadPhotos(c);
   el("read").hidden = openingTitle === c.title;
@@ -833,15 +948,27 @@ function showCard(c){
   el("back").hidden = !prev;
   if(prev) el("backTitle").textContent = prev.item.title;
 }
+function sectionIconFor(label){
+  const sec = SECTIONS.find(([, g]) => Object.values(g).some(x => x.label === label));
+  return sec ? SECTION_ICONS[sec[0]] : '<svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H10l2 2h6.5c.8 0 1.5.7 1.5 1.5v11c0 .8-.7 1.5-1.5 1.5h-13C4.7 20 4 19.3 4 18.5z"/></svg>';
+}
 function showHero(c){
   const hero = el("hero"), box = el("heroBox");
-  hero.classList.remove("loaded"); box.classList.remove("done");
+  hero.classList.remove("loaded"); box.classList.remove("done", "nophoto");
+  const old = box.querySelector(".banner"); if(old) old.remove();
   if(c.thumb){
     const shown = () => { hero.classList.add("loaded"); box.classList.add("done"); };
-    hero.onload = shown; hero.onerror = () => { box.hidden = true; };
+    hero.onload = shown; hero.onerror = () => { hero.removeAttribute("src"); showBanner(c); };
     hero.src = c.thumb; hero.alt = c.title; box.hidden = false;
     if(hero.complete && hero.naturalWidth) shown();
-  } else { hero.removeAttribute("src"); box.hidden = true; }
+  } else { hero.removeAttribute("src"); showBanner(c); }
+}
+function showBanner(c){
+  const box = el("heroBox"); box.hidden = false; box.classList.add("nophoto", "done");
+  const yr = storyYear(c.extract || "");
+  const b = document.createElement("div"); b.className = "banner"; b.setAttribute("aria-hidden", "true");
+  b.innerHTML = '<span class="stamp">CASE FILE</span><span class="sicon">' + sectionIconFor(c.cat) + '</span><span class="lbl">No. <b>' + caseNo(c.title) + '</b>' + (yr ? ' · ' + yr : '') + '</span>';
+  box.append(b);
 }
 
 let openingTitle = "";
@@ -999,7 +1126,7 @@ el("lightbox").addEventListener("touchend", ev => {
   const dx = ev.changedTouches[0].clientX - lbX; lbX = null;
   if(Math.abs(dx) > 50) (dx < 0 ? el("lbNext") : el("lbPrev")).click();
 }, {passive:true});
-el("heroBox").addEventListener("click", () => { if(gallery.length) openLightbox(0, null, el("heroBox")); else if(state.current && state.current.thumb) openLightbox(0, [{thumb: state.current.thumb, big: sized(state.current.thumb, 960), cap: ""}], el("heroBox")); });
+el("heroBox").addEventListener("click", () => { if(el("heroBox").classList.contains("nophoto")) return; if(gallery.length) openLightbox(0, null, el("heroBox")); else if(state.current && state.current.thumb) openLightbox(0, [{thumb: state.current.thumb, big: sized(state.current.thumb, 960), cap: ""}], el("heroBox")); });
 
 // Older saved/recent entries may be missing a photo; look them up once.
 async function backfillThumbs(){
@@ -1047,6 +1174,29 @@ async function findStory(){
 
 
 let listCount = 0;
+function addSwipe(li, pick, onRemove){
+  li.classList.add("swipe");
+  const del = document.createElement("span"); del.className = "del"; del.textContent = "Remove"; li.prepend(del);
+  let x0 = 0, y0 = 0, dx = 0, on = false, horiz = null, moved = false;
+  const parts = () => [pick, li.querySelector(".rm")];
+  li.addEventListener("pointerdown", e => { if(e.pointerType === "mouse") return; x0 = e.clientX; y0 = e.clientY; dx = 0; on = true; horiz = null; moved = false; });
+  li.addEventListener("pointermove", e => {
+    if(!on) return;
+    const mx = e.clientX - x0, my = e.clientY - y0;
+    if(horiz === null && Math.abs(mx) + Math.abs(my) > 8) horiz = Math.abs(mx) > Math.abs(my);
+    if(!horiz) return;
+    moved = true; dx = Math.min(0, mx); li.classList.add("dragging");
+    parts().forEach(p => p.style.transform = "translateX(" + dx + "px)");
+    del.style.opacity = Math.min(1, -dx / 90);
+  });
+  const end = () => {
+    if(!on) return; on = false; li.classList.remove("dragging");
+    if(dx < -90){ if(navigator.vibrate) try{ navigator.vibrate(10); }catch(err){} onRemove(); }
+    else { parts().forEach(p => p.style.transform = ""); del.style.opacity = 0; }
+  };
+  li.addEventListener("pointerup", end); li.addEventListener("pointercancel", end);
+  pick.addEventListener("click", e => { if(moved){ e.stopImmediatePropagation(); e.preventDefault(); moved = false; } }, true);
+}
 function listItem(c, sub, onPick, onRemove){
   const li = document.createElement("li"), b = document.createElement("button"); b.type = "button"; b.className = "pick";
   const img = document.createElement("img"); img.className = "th"; img.alt = ""; img.loading = "lazy";
@@ -1060,7 +1210,9 @@ function listItem(c, sub, onPick, onRemove){
   if(onRemove){
     const x = document.createElement("button"); x.type = "button"; x.className = "rm"; x.textContent = "✕";
     x.setAttribute("aria-label", "Remove " + c.title + " from saved");
-    x.addEventListener("click", onRemove); li.append(x);
+    const removeIt = () => { li.classList.add("gone"); setTimeout(onRemove, reduce() ? 0 : 320); };
+    x.addEventListener("click", removeIt); li.append(x);
+    addSwipe(li, b, removeIt);
   }
   return li;
 }
@@ -1406,9 +1558,11 @@ async function openArticle(title, restore, y){
     art.querySelectorAll("img").forEach(img => { if(img.complete && img.naturalWidth) img.classList.add("loaded"); else img.addEventListener("load", () => img.classList.add("loaded"), {once:true}); img.addEventListener("error", () => { const o = img.dataset.orig; if(o && img.src !== o){ img.src = o; } else img.remove(); }); });
     const firstP = [...art.querySelectorAll("p")].find(p => !p.closest(".infobox-wrap,.tablewrap,figure") && p.textContent.trim().length > 60);
     if(firstP) firstP.classList.add("lead");
+    smartNodes(art);
+    const end = document.createElement("div"); end.className = "endmark"; end.textContent = "END OF FILE"; art.append(end);
     buildToc();
     const words = (art.textContent.match(/\S+/g) || []).length;
-    el("mins").textContent = mins(words);
+    setMins(mins(words));
     const page = "https://en.wikipedia.org/wiki/" + encodeURIComponent(title.replace(/ /g, "_"));
     const credit = el("credit"); credit.innerHTML = "";
     const p1 = document.createElement("span");
@@ -1505,6 +1659,24 @@ el("back").addEventListener("click", () => {
 let ignorePop = false;
 addEventListener("popstate", () => { if(ignorePop){ ignorePop = false; return; } if((browsePage || eraFor) && currentView === "browse"){ if(browseDepth) browseDepth--; browseBack(); return; } if(sheetKind){ closeSheet(true); return; } if(!el("lightbox").hidden){ closeLightbox(true); return; } if(backStack.length) goBack(); });
 
+// brass progress line, and the tab bar steps aside while reading
+let lastY = scrollY, scrollRaf = 0;
+addEventListener("scroll", () => {
+  if(scrollRaf) return;
+  scrollRaf = requestAnimationFrame(() => {
+    scrollRaf = 0;
+    const art = el("article"), bar = el("progress"), tb = document.querySelector(".tabbar");
+    const reading = currentView === "tonight" && art.childNodes.length && art.offsetHeight > 400;
+    if(reading){
+      const p = Math.min(1, Math.max(0, (scrollY + innerHeight * .5 - art.offsetTop) / art.offsetHeight));
+      bar.style.transform = "scaleX(" + p + ")"; bar.classList.toggle("on", scrollY > art.offsetTop - 200);
+      const dy = scrollY - lastY, inArt = scrollY > art.offsetTop - 120 && scrollY + innerHeight < document.documentElement.scrollHeight - 60;
+      if(inArt && dy > 6) tb.classList.add("away"); else if(dy < -6 || !inArt) tb.classList.remove("away");
+    } else { bar.classList.remove("on"); tb.classList.remove("away"); }
+    document.body.classList.toggle("tabs-away", tb.classList.contains("away"));
+    lastY = scrollY;
+  });
+}, {passive:true});
 // remember reading position
 let progT = 0;
 addEventListener("scroll", () => {
@@ -1659,6 +1831,21 @@ function burstSave(){
   const d = el("savedDot"); setTimeout(() => { d.classList.remove("pop"); void d.offsetWidth; d.classList.add("pop"); }, 60);
   if(navigator.vibrate) try{ navigator.vibrate([8, 40, 12]); }catch(err){}
 }
+(function iosHint(){
+  const ua = navigator.userAgent;
+  const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const standalone = navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
+  let seen = false; try{ seen = localStorage.getItem("nightfile.ioshint") === "1"; }catch(e){}
+  if(!ios || standalone || seen) return;
+  const inApp = /CriOS|FxiOS|EdgiOS|GSA\/|Instagram|FBAN|FBAV|Snapchat|Line\//.test(ua);
+  const share = '<svg viewBox="0 0 24 24"><path d="M12 15V3.5M8 7.5l4-4 4 4"/><path d="M8.5 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7a1.5 1.5 0 0 0-1.5-1.5h-2"/></svg>';
+  setTimeout(() => {
+    const d = document.createElement("div"); d.className = "ioshint"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Install Night File");
+    d.innerHTML = '<img src="icon-192.png" alt=""><div><b>Install Night File</b>' + (inApp ? 'Open this page in Safari, then tap Share ' + share + ' and \u201cAdd to Home Screen\u201d.' : 'Tap Share ' + share + ', then \u201cAdd to Home Screen\u201d.') + '</div><button class="x" type="button" aria-label="Close">✕</button>';
+    d.querySelector(".x").addEventListener("click", () => { d.remove(); try{ localStorage.setItem("nightfile.ioshint", "1"); }catch(e){} });
+    document.body.append(d);
+  }, 4000);
+})();
 (function splash(){
   const sp = el("splash");
   if(reduce()){ sp.remove(); lightUp(document.querySelector(".mast")); return; }
