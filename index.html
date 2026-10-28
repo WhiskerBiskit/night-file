@@ -502,7 +502,7 @@ h1{letter-spacing:-.005em}
 .heroBox.nophoto{height:clamp(150px,40vw,210px);cursor:default;animation:none;
   background:repeating-linear-gradient(135deg,rgba(255,235,200,.025) 0 2px,transparent 2px 12px),radial-gradient(90% 120% at 50% 0%,#1f3326,var(--deep))}
 .heroBox.nophoto .hero{display:none}
-.banner{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.banner{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
 .banner .sicon{width:64px;height:64px;box-shadow:0 0 30px rgba(230,170,80,.18),inset 0 0 0 4px rgba(10,16,12,.6)}
 .banner .sicon svg{width:28px;height:28px}
 .banner .lbl{font-family:var(--f-ui);font-size:13px;letter-spacing:.32em;color:var(--soft);padding-left:.32em}
@@ -582,11 +582,135 @@ body.tabs-away .mini{bottom:calc(18px + env(safe-area-inset-bottom, 0px)) !impor
 .ioshint b{display:block;font-family:var(--f-head);font-weight:600;font-size:18px;color:var(--lamp)}
 .ioshint svg{width:16px;height:16px;vertical-align:-3px;stroke:var(--lamp);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ioshint .x{all:unset;cursor:pointer;flex:none;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;color:var(--soft);font-size:15px;align-self:flex-start}
+/* ================= cinematic pass ================= */
+/* --tx/--ty: phone tilt (or pointer), -1..1, smoothed in JS. --py: scroll parallax for the photo. */
+:root{--tx:0;--ty:0}
+/* ambient light: the story's photo bleeds its colour into the room, like a screen glowing in the dark */
+.ambient{position:fixed;left:-20vw;right:-20vw;top:-14vh;height:86vh;z-index:0;pointer-events:none;opacity:.62;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.75) 45%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.75) 45%,transparent 100%);
+  transform:translate3d(calc(var(--tx) * -18px),calc(var(--ty) * -12px),0);will-change:transform}
+.ambient img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;filter:blur(46px) saturate(1.35) brightness(.62) sepia(.25);transform:scale(1.15);transition:opacity 1.6s var(--ease)}
+.ambient img.on{opacity:1}
+/* drifting ground fog */
+.fog{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.fog i{position:absolute;left:-60%;width:220%;height:46vh;opacity:.5;
+  background:radial-gradient(38% 50% at 22% 50%,rgba(170,190,160,.09),transparent 70%),radial-gradient(30% 42% at 64% 46%,rgba(200,190,160,.07),transparent 70%),radial-gradient(26% 40% at 88% 56%,rgba(160,180,150,.08),transparent 70%);
+  animation:fogDrift 70s linear infinite alternate}
+.fog i:first-child{top:4vh}
+.fog i:last-child{top:52vh;opacity:.38;animation-duration:96s;animation-direction:alternate-reverse}
+@keyframes fogDrift{from{transform:translate3d(-8%,0,0)}to{transform:translate3d(14%,-2vh,0)}}
+/* dust in the lamplight, drawn on a canvas in front of everything but the tab bar */
+.motes{position:fixed;inset:0;width:100%;height:100%;z-index:30;pointer-events:none;opacity:1;transition:opacity 1.2s var(--ease)}
+body.reading .motes{opacity:0}
+/* film grain that actually moves */
+body::after{inset:-60%;opacity:.075;animation:grain 1.1s steps(1) infinite}
+@keyframes grain{0%{transform:translate(0,0)}14%{transform:translate(-4%,3%)}28%{transform:translate(3%,-5%)}42%{transform:translate(-6%,-2%)}57%{transform:translate(5%,4%)}71%{transform:translate(-2%,6%)}85%{transform:translate(6%,-3%)}}
+.vignette{background:radial-gradient(ellipse 90% 80% at 50% 40%,transparent 50%,rgba(0,0,0,.62) 100%)}
+
+/* ---- the story card becomes a poster: big photo, title set on it ---- */
+.file{position:relative}
+.file::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;border-radius:inherit;mix-blend-mode:soft-light;
+  background:radial-gradient(55% 38% at calc(50% + var(--tx) * 34%) calc(18% + var(--ty) * 18%),rgba(255,226,170,.22),transparent 70%)}
+.heroBox{height:clamp(320px,94vw,480px);isolation:isolate}
+.heroCam{position:absolute;inset:-6%;transform:translate3d(calc(var(--tx) * -12px),calc(var(--ty) * -9px + var(--py,0px)),0);will-change:transform}
+.file .hero{transform:scale(1.04);transform-origin:50% 40%;transition:opacity .9s var(--ease)}
+.file .hero.loaded{opacity:1;transform:scale(1.04);animation:kenburns 28s ease-in-out infinite alternate}
+@keyframes kenburns{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.16) translate(-2.2%,-1.6%)}}
+/* deep grade under the title, plus letterbox shading at the top */
+.heroBox::after{z-index:1;background:
+  linear-gradient(180deg,rgba(8,6,4,.55) 0%,transparent 22%,transparent 38%,rgba(20,15,10,.55) 62%,rgba(36,27,20,.97) 100%),
+  radial-gradient(130% 80% at 50% 22%,rgba(230,160,70,.12),transparent 65%)}
+.heroCap{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 20px 18px;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.heroCap h1{font-size:clamp(32px,8.6vw,46px);line-height:1.04;letter-spacing:-.012em;color:#f6eedb;
+  text-shadow:0 2px 24px rgba(0,0,0,.75),0 1px 2px rgba(0,0,0,.6),0 0 1px rgba(255,214,140,.35)}
+.heroCap h1 .w{display:inline-block}
+.heroCap .meta .mi{color:rgba(246,238,219,.86);text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.heroCap .tag{background:rgba(18,13,8,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.heroBox .caseno{top:14px;bottom:auto;right:16px;padding:4px 10px 3px;border-radius:3px;background:rgba(10,8,5,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:inset 0 0 0 1px rgba(240,207,122,.25)}
+.heroBox.nophoto{height:clamp(300px,84vw,420px)}
+.heroBox.nophoto .heroCam{display:none}
+.heroBox.nophoto .banner{justify-content:flex-start;padding-top:46px}
+.heroBox.nophoto .caseno{display:none}
+.flash{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;background:radial-gradient(80% 70% at 50% 40%,#fff6e0,rgba(255,236,200,.4) 50%,transparent 80%);mix-blend-mode:screen}
+.strip{padding-top:14px}
+.file .body{padding-top:14px}
+.desc{font-size:.95em}
+
+/* ---- story change: the old file falls out of focus, a flashbulb, the new one develops ---- */
+#file{transition:opacity .28s var(--ease),transform .28s var(--ease),filter .28s var(--ease)}
+#file.swap-out{opacity:0;transform:scale(.975);filter:blur(7px)}
+#file.swap-in #heroBox{animation:none}
+#file.swap-in .flash{animation:flashbulb .9s cubic-bezier(.2,.7,.2,1) .05s both}
+@keyframes flashbulb{0%{opacity:0}12%{opacity:.75}100%{opacity:0}}
+#file.swap-in .heroCam{animation:develop 1.4s cubic-bezier(.16,.8,.2,1) both}
+@keyframes develop{from{filter:brightness(1.9) contrast(.7) saturate(0) blur(3px);scale:1.12}to{filter:none;scale:1}}
+#file.swap-in .heroCap .meta{animation:capIn .7s var(--ease) .32s both}
+#file.swap-in .heroCap h1 .w{animation:wordIn .8s cubic-bezier(.2,.75,.2,1) both;animation-delay:calc(.4s + var(--i,0) * 70ms)}
+@keyframes wordIn{from{opacity:0;transform:translateY(14px);filter:blur(10px)}to{opacity:1;transform:none;filter:none}}
+@keyframes capIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#file.swap-in .body > .lede{animation:focusPull 1.1s var(--ease) .55s both}
+@keyframes focusPull{from{opacity:0;filter:blur(6px)}to{opacity:1;filter:none}}
+
+/* ---- brass that catches the light as the phone moves ---- */
+button.primary{background:linear-gradient(180deg,#f3d27e 0%,#e2b552 30%,var(--lamp) 58%,#a8782a 100%);border-color:#8f6524;
+  text-shadow:0 1px 0 rgba(255,240,200,.55);letter-spacing:.07em;
+  box-shadow:inset 0 1px 0 rgba(255,246,214,.75),inset 0 -2px 0 rgba(90,60,20,.45),inset 0 0 0 1px rgba(255,230,170,.18),0 8px 22px -8px rgba(212,166,64,.6),0 0 30px -10px rgba(240,190,90,.45)}
+button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;mix-blend-mode:overlay;
+  background:radial-gradient(60% 140% at calc(50% + var(--tx) * 60%) -10%,rgba(255,255,255,.55),transparent 60%)}
+.cardact .iconbtn{background:linear-gradient(180deg,rgba(255,226,170,.06),rgba(0,0,0,.12));box-shadow:inset 0 1px 0 rgba(255,226,170,.12)}
+
+/* ---- glass tab bar so the room shows through ---- */
+.tabbar{background:linear-gradient(180deg,rgba(34,26,18,.74),rgba(20,15,10,.86));backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5)}
+.tab[aria-current="page"]{text-shadow:0 0 14px rgba(240,190,90,.55)}
+.tabind::after{content:"";position:absolute;left:18%;right:18%;top:0;height:40px;background:radial-gradient(50% 60% at 50% 0%,rgba(240,195,100,.22),transparent 70%)}
+
+/* ---- the nameplate: rim light and a slow idle shimmer ---- */
+/* engraved gold: a fixed metal gradient, with the moving sheen layered on top */
+.brand .name.foil{background-image:linear-gradient(100deg,transparent 0%,transparent 42%,rgba(255,250,230,.95) 50%,transparent 58%,transparent 100%),linear-gradient(180deg,#fff0c4 0%,#f1cf7c 38%,#b5863a 52%,#e2bb66 70%,#f6dc96 100%);
+  background-size:260% 100%,100% 100%;background-position:100% 0,0 0;filter:drop-shadow(0 1px 0 rgba(0,0,0,.65)) drop-shadow(0 0 14px rgba(240,190,90,.22))}
+.brand .name i{color:transparent}
+.brand .name.foil.idle{animation:foilIdle 11s cubic-bezier(.3,.6,.2,1) infinite}
+.brand .name.foil.lit{animation:metal 1.8s cubic-bezier(.3,.6,.2,1) .15s both}
+@keyframes metal{from{background-position:100% 0,0 0}to{background-position:0 0,0 0}}
+@keyframes foilIdle{0%{background-position:100% 0,0 0}16%{background-position:0 0,0 0}100%{background-position:0 0,0 0}}
+.ctx{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(51,39,29,.62),rgba(42,32,24,.7))}
+.surprise{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+/* browse rows file in one after another */
+.view.inR .bpage .brow,.view.inL .bpage .brow{animation:rise .5s var(--ease) both}
+.bpage .brow:nth-child(2){animation-delay:.05s}.bpage .brow:nth-child(3){animation-delay:.1s}.bpage .brow:nth-child(4){animation-delay:.15s}
+.bpage .brow:nth-child(5){animation-delay:.2s}.bpage .brow:nth-child(6){animation-delay:.25s}.bpage .brow:nth-child(7){animation-delay:.3s}.bpage .brow:nth-child(8){animation-delay:.35s}
+.sicon{box-shadow:0 0 18px -4px rgba(240,190,90,.35),inset 0 0 12px rgba(240,190,90,.08)}
+
+/* ---- opening title sequence ---- */
+.splash{background:radial-gradient(70% 46% at 50% 44%,#1d2e22 0%,#0b140e 60%,#050906 100%);overflow:hidden;transition:opacity .7s var(--ease),transform .9s var(--ease)}
+.splash.out{transform:scale(1.06)}
+.splash .sp{position:relative;z-index:2;animation:push 2.4s cubic-bezier(.2,.6,.2,1) both}
+@keyframes push{from{transform:scale(.94)}to{transform:scale(1)}}
+.splash .spfog{position:absolute;inset:-30%;z-index:1;background:radial-gradient(30% 22% at 30% 55%,rgba(180,200,170,.08),transparent 70%),radial-gradient(34% 24% at 72% 48%,rgba(210,190,150,.07),transparent 70%);animation:fogDrift 9s linear both}
+.splash .nm{font-size:34px}
+.splash .nm .gold{background-image:linear-gradient(100deg,transparent 0%,transparent 42%,rgba(255,250,230,.95) 50%,transparent 58%,transparent 100%),linear-gradient(180deg,#fff0c4 0%,#f1cf7c 38%,#b5863a 52%,#e2bb66 70%,#f6dc96 100%);background-size:280% 100%,100% 100%;background-position:100% 0,0 0;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:metal 1.5s cubic-bezier(.3,.6,.2,1) .7s both;filter:drop-shadow(0 0 18px rgba(240,190,90,.28))}
+.splash .nm .gold i{color:transparent}
+/* anamorphic flare that sweeps behind the title */
+.splash .flare{position:absolute;left:50%;top:50%;z-index:1;width:160vw;height:2px;margin:-1px 0 0 -80vw;border-radius:50%;opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(120,170,255,.0) 10%,rgba(150,190,255,.55) 35%,#fff4d8 50%,rgba(255,200,120,.55) 65%,transparent 90%);
+  box-shadow:0 0 18px 2px rgba(255,210,140,.35);animation:flare 1.6s cubic-bezier(.3,.6,.2,1) .55s both}
+@keyframes flare{0%{opacity:0;transform:translateX(-30%) scaleX(.4)}35%{opacity:1}100%{opacity:0;transform:translateX(30%) scaleX(1.1)}}
+/* letterbox bars that open as the app comes up */
+.splash .bars{position:absolute;inset:0;z-index:3;pointer-events:none}
+.splash .bars i{position:absolute;left:0;right:0;height:11vh;background:#000;z-index:3;transition:transform .8s cubic-bezier(.7,0,.2,1)}
+.splash .bars i:first-child{top:0}
+.splash .bars i:last-child{bottom:0}
+.splash.out .bars i:first-child{transform:translateY(-100%)}
+.splash.out .bars i:last-child{transform:translateY(100%)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}.file .hero,#article img{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<div class="ambient" id="ambient" aria-hidden="true"><img alt=""><img alt=""></div>
+<div class="fog" aria-hidden="true"><i></i><i></i></div>
 <div class="lamp" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
+<canvas class="motes" id="motes" aria-hidden="true"></canvas>
 <div class="wrap">
   <header class="mast">
     <button class="brand" id="home" type="button" aria-label="Night File, back to top">
@@ -610,12 +734,18 @@ body.tabs-away .mini{bottom:calc(18px + env(safe-area-inset-bottom, 0px)) !impor
     <p class="msg" id="msg" hidden></p>
     <button class="small" id="widen" type="button" hidden>Widen to any era</button>
     <div id="card" hidden>
-      <div class="heroBox" id="heroBox" hidden><img class="hero" id="hero" alt=""><span class="caseno" id="caseno"></span></div>
+      <div class="heroBox" id="heroBox" hidden>
+        <div class="heroCam"><img class="hero" id="hero" alt=""></div>
+        <div class="flash" aria-hidden="true"></div>
+        <span class="caseno" id="caseno"></span>
+        <div class="heroCap">
+          <div class="meta"><span class="tag" id="cat"></span><span class="mi" id="mins"></span><span class="mi" id="year"></span></div>
+          <h1 id="title"></h1>
+        </div>
+      </div>
       <div class="strip" id="strip" hidden aria-label="Photos from this story"></div>
       <div class="body">
         <button class="back" id="back" type="button" hidden>← Back to <span id="backTitle"></span></button>
-        <div class="meta"><span class="tag" id="cat"></span><span class="mi" id="mins"></span><span class="mi" id="year"></span></div>
-        <h1 id="title"></h1>
         <p class="desc" id="desc"></p>
         <p class="lede" id="lede"></p>
         <div class="cardact" id="actions">
@@ -680,7 +810,7 @@ body.tabs-away .mini{bottom:calc(18px + env(safe-area-inset-bottom, 0px)) !impor
   </section>
 </div>
 
-<div class="splash" id="splash" aria-hidden="true"><div class="sp"><div class="rules"><i></i><b>◆</b><i></i></div><div class="nm">Night <i>·</i> File</div><div class="sb">CASE FILES · AFTER DARK</div></div></div>
+<div class="splash" id="splash" aria-hidden="true"><div class="spfog"></div><div class="flare"></div><div class="sp"><div class="rules"><i></i><b>◆</b><i></i></div><div class="nm"><span class="gold">Night <i>·</i> File</span></div><div class="sb">CASE FILES · AFTER DARK</div></div><div class="bars"><i></i><i></i></div></div>
 <div class="progress" id="progress" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <nav class="tabbar" aria-label="Sections">
@@ -940,7 +1070,7 @@ function showCard(c){
   const yr = storyYear(c.extract || "");
   el("year").innerHTML = yr ? '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>' + yr : "";
   el("caseno").innerHTML = "No. <b>" + caseNo(c.title) + "</b>";
-  el("title").textContent = c.title;
+  setTitle(c.title);
   el("desc").textContent = c.desc ? smart(c.desc.charAt(0).toUpperCase() + c.desc.slice(1)) : "";
   el("desc").hidden = !c.desc;
   el("lede").textContent = smart(firstSentences(c.extract || "", 3));
@@ -963,12 +1093,12 @@ function showHero(c){
   if(c.thumb){
     const shown = () => { hero.classList.add("loaded"); box.classList.add("done"); };
     hero.onload = shown; hero.onerror = () => { hero.removeAttribute("src"); showBanner(c); };
-    hero.src = c.thumb; hero.alt = c.title; box.hidden = false;
+    hero.src = c.thumb; hero.alt = c.title; box.hidden = false; setAmbient(c.thumb);
     if(hero.complete && hero.naturalWidth) shown();
   } else { hero.removeAttribute("src"); showBanner(c); }
 }
 function showBanner(c){
-  const box = el("heroBox"); box.hidden = false; box.classList.add("nophoto", "done");
+  const box = el("heroBox"); box.hidden = false; box.classList.add("nophoto", "done"); setAmbient("");
   const yr = storyYear(c.extract || "");
   const b = document.createElement("div"); b.className = "banner"; b.setAttribute("aria-hidden", "true");
   b.innerHTML = '<span class="stamp">CASE FILE</span><span class="sicon">' + sectionIconFor(c.cat) + '</span><span class="lbl">No. <b>' + caseNo(c.title) + '</b>' + (yr ? ' · ' + yr : '') + '</span>';
@@ -1678,6 +1808,8 @@ addEventListener("scroll", () => {
       if(inArt && dy > 6) tb.classList.add("away"); else if(dy < -6 || !inArt) tb.classList.remove("away");
     } else { bar.classList.remove("on"); tb.classList.remove("away"); }
     document.body.classList.toggle("tabs-away", tb.classList.contains("away"));
+    document.body.classList.toggle("reading", !!reading && scrollY > art.offsetTop - innerHeight * .45);
+    parallax();
     lastY = scrollY;
   });
 }, {passive:true});
@@ -1823,6 +1955,97 @@ document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () =>
 /* ---------- polish helpers ---------- */
 function shine(b){ if(!b || reduce()) return; b.classList.remove("shine"); void b.offsetWidth; b.classList.add("shine"); }
 function lightUp(root){ if(reduce()) return; (root || document).querySelectorAll(".foil").forEach(f => { f.classList.remove("lit"); void f.offsetWidth; f.classList.add("lit"); }); root && root.querySelectorAll && root.querySelectorAll(".surprise").forEach(b => setTimeout(() => shine(b), 500)); }
+/* ---------- cinematic layer: title words, ambient light, tilt, scroll parallax, lamplit dust ---------- */
+function setTitle(t){
+  const h = el("title"); h.textContent = "";
+  t.split(/\s+/).forEach((w, i) => { if(i) h.append(" "); const s = document.createElement("span"); s.className = "w"; s.style.setProperty("--i", i); s.textContent = w; h.append(s); });
+}
+let ambOn = 0;
+function setAmbient(src){
+  const imgs = el("ambient").querySelectorAll("img");
+  if(!src){ imgs.forEach(i => i.classList.remove("on")); return; }
+  if(imgs[ambOn].classList.contains("on") && imgs[ambOn].getAttribute("src") === src) return;
+  const next = imgs[1 - ambOn];
+  next.onload = () => { next.classList.add("on"); imgs[ambOn].classList.remove("on"); ambOn = 1 - ambOn; };
+  next.src = src;
+  if(next.complete && next.naturalWidth) next.onload();
+}
+function idleFoil(){ if(reduce()) return; const n = document.querySelector(".brand .name"); if(n){ n.classList.remove("lit"); n.classList.add("idle"); } }
+function parallax(){
+  const box = el("heroBox");
+  if(reduce() || box.hidden || currentView !== "tonight"){ box.style.removeProperty("--py"); return; }
+  const top = box.getBoundingClientRect().top;
+  box.style.setProperty("--py", Math.max(0, Math.min(140, -top * .3)).toFixed(1) + "px");
+}
+const fx = {tx:0, ty:0, cx:0, cy:0, b0:null, g0:null};
+const clamp1 = v => Math.max(-1, Math.min(1, v));
+addEventListener("deviceorientation", e => {
+  if(e.beta == null || e.gamma == null) return;
+  if(fx.b0 === null){ fx.b0 = e.beta; fx.g0 = e.gamma; }
+  fx.b0 += (e.beta - fx.b0) * .015; fx.g0 += (e.gamma - fx.g0) * .015;   // slowly re-centre on however you're holding it
+  fx.tx = clamp1((e.gamma - fx.g0) / 16); fx.ty = clamp1((e.beta - fx.b0) / 16);
+}, {passive:true});
+if(matchMedia("(hover:hover)").matches) addEventListener("pointermove", e => { fx.tx = clamp1((e.clientX / innerWidth - .5) * 1.4); fx.ty = clamp1((e.clientY / innerHeight - .5) * 1.4); }, {passive:true});
+
+const motes = (() => {
+  const cv = el("motes"), cx = cv.getContext("2d");
+  const spr = document.createElement("canvas"); spr.width = spr.height = 64;
+  const sc = spr.getContext("2d"), g = sc.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, "rgba(255,236,196,1)"); g.addColorStop(.25, "rgba(255,206,130,.55)"); g.addColorStop(1, "rgba(255,190,100,0)");
+  sc.fillStyle = g; sc.fillRect(0, 0, 64, 64);
+  let W = 0, H = 0, dpr = 1, list = [];
+  function make(big){
+    const z = Math.random();
+    return big ? {x:Math.random() * W, y:Math.random() * H * .7, z, r:20 + z * 30, vy:-(2 + z * 3), a:.035 + z * .03, f:.2 + Math.random() * .3, p:Math.random() * 7, big:1}
+               : {x:Math.random() * W, y:Math.random() * H, z, r:.9 + z * 2.4, vy:-(5 + z * 12), a:.3 + z * .6, f:.6 + Math.random() * 1.6, p:Math.random() * 7, sway:8 + Math.random() * 16};
+  }
+  function size(){
+    dpr = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(38, W * H / 9000));
+    list = [...Array(n)].map(() => make(false)).concat([...Array(4)].map(() => make(true)));
+  }
+  size(); addEventListener("resize", size);
+  return function draw(t, dt){
+    cx.clearRect(0, 0, W, H);
+    cx.globalCompositeOperation = "lighter";
+    const ox = fx.cx, oy = fx.cy;
+    for(const m of list){
+      m.y += m.vy * dt;
+      if(m.y < -60){ Object.assign(m, make(!!m.big)); m.y = H + 40; }
+      const sx = m.big ? 0 : Math.sin(t * .00025 * m.f + m.p) * m.sway;
+      const x = m.x + sx + ox * (m.z * 22 + 4), y = m.y + oy * (m.z * 14 + 3);
+      // light falls from the lamp at the top: brighter near it, gone by the bottom
+      const light = Math.max(0, 1.1 - y / (H * .78)) * (1 - Math.min(1, Math.abs(x - W / 2) / (W * .95)));
+      const tw = m.big ? 1 : .55 + .45 * Math.sin(t * .0016 * m.f + m.p);
+      const a = m.a * light * tw;
+      if(a < .01) continue;
+      cx.globalAlpha = a; const d = m.r * (m.big ? 2 : 3.2);
+      cx.drawImage(spr, x - d / 2, y - d / 2, d, d);
+    }
+    cx.globalAlpha = 1;
+  };
+})();
+let fxLast = 0, fxSkip = false, fxIdle = 0;
+function fxFrame(t){
+  requestAnimationFrame(fxFrame);
+  if(document.hidden) return;
+  const still = reduce();
+  // ease toward the tilt target so it glides instead of jittering
+  const tx = still ? 0 : fx.tx, ty = still ? 0 : fx.ty;
+  fx.cx += (tx - fx.cx) * .07; fx.cy += (ty - fx.cy) * .07;
+  const rs = document.documentElement.style;
+  rs.setProperty("--tx", fx.cx.toFixed(3)); rs.setProperty("--ty", fx.cy.toFixed(3));
+  fxSkip = !fxSkip; if(fxSkip) return;             // dust runs at half rate: smooth enough, easy on the battery
+  const dt = Math.min(.1, (t - (fxLast || t)) / 1000); fxLast = t;
+  const cv = el("motes");
+  if(still){ if(!cv.dataset.clear){ cv.getContext("2d").clearRect(0, 0, cv.width, cv.height); cv.dataset.clear = "1"; } return; }
+  delete cv.dataset.clear;
+  // while reading, the dust fades out; keep drawing through the fade, then rest
+  if(document.body.classList.contains("reading")){ if(++fxIdle > 50) return; } else fxIdle = 0;
+  motes(t, dt);
+}
+requestAnimationFrame(fxFrame);
 document.addEventListener("pointerdown", e => {
   const b = e.target.closest && e.target.closest("button.primary,.surprise");
   if(b) shine(b);
@@ -1853,7 +2076,10 @@ function burstSave(){
 (function splash(){
   const sp = el("splash");
   if(reduce()){ sp.remove(); lightUp(document.querySelector(".mast")); return; }
-  setTimeout(() => { sp.classList.add("out"); lightUp(document.querySelector(".mast")); setTimeout(() => sp.remove(), 600); }, 1250);
+  let done = false;
+  const go = () => { if(done) return; done = true; sp.classList.add("out"); lightUp(document.querySelector(".mast")); setTimeout(idleFoil, 2200); setTimeout(() => sp.remove(), 950); };
+  sp.addEventListener("pointerdown", go);
+  setTimeout(go, 1900);
 })();
 el("ctxBtn").addEventListener("click", () => {
   showView("browse", true);
