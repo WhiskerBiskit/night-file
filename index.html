@@ -703,6 +703,58 @@ button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-ev
 .splash .bars i:last-child{bottom:0}
 .splash.out .bars i:first-child{transform:translateY(-100%)}
 .splash.out .bars i:last-child{transform:translateY(100%)}
+/* ================= tonight's case ================= */
+.tcase{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;gap:14px;width:100%;padding:10px 14px 10px 10px;border-radius:var(--r-lg);
+  border:1px solid color-mix(in srgb,var(--brass) 70%,transparent);
+  background:radial-gradient(90% 160% at 0% 50%,rgba(240,190,100,.16),transparent 60%),linear-gradient(180deg,rgba(56,42,28,.72),rgba(38,29,20,.8));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:inset 0 1px 0 rgba(255,226,170,.16),0 0 34px -12px rgba(240,190,90,.45),0 18px 36px -22px #000;animation:rise .6s var(--ease) both;transition:transform .14s var(--ease),filter .2s}
+.tcase:active{transform:scale(.985);filter:brightness(1.1)}
+.tcase:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
+.tcase::after{content:"";position:absolute;inset:-2px;z-index:-1;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,226,150,.16) 50%,transparent 65%);transform:translateX(-130%);animation:sheen 1.4s cubic-bezier(.3,.6,.2,1) 1.2s both}
+.tcThumb{position:relative;flex:none;width:58px;height:58px;border-radius:10px;overflow:hidden;background:radial-gradient(circle at 50% 35%,#2a4030,var(--deep));box-shadow:0 0 0 1px rgba(240,207,122,.35),0 6px 14px -6px #000}
+.tcThumb img{width:100%;height:100%;object-fit:cover;display:block;filter:sepia(.22) saturate(.8) contrast(1.06) brightness(.9);opacity:0;transition:opacity .6s var(--ease)}
+.tcThumb img.loaded{opacity:1}
+.tcIcon{position:absolute;inset:0;display:grid;place-items:center;color:var(--brass-hi)}
+.tcIcon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.tcThumb img.loaded + .tcIcon{display:none}
+.tcTx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.tcTx small{display:flex;align-items:center;gap:7px;font-family:var(--f-ui);font-size:13px;letter-spacing:.08em;color:var(--lamp)}
+.tcTx .pip{width:7px;height:7px;border-radius:50%;background:var(--brass-hi);box-shadow:0 0 8px rgba(255,210,120,.9);animation:pip 2.4s ease-in-out infinite}
+@keyframes pip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
+.tcTx b{font-family:var(--f-head);font-weight:600;font-size:19px;line-height:1.2;color:var(--paper);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcTx em{font-size:14px;color:var(--soft);line-height:1.3}
+.tcGo{flex:none;color:var(--lamp);font-size:22px}
+.tcase.read .pip{animation:none;background:var(--moss);box-shadow:none}
+.tcase.now{border-color:color-mix(in srgb,var(--brass) 40%,transparent);box-shadow:inset 0 1px 0 rgba(255,226,170,.1),0 18px 36px -22px #000}
+.ribbon{position:absolute;left:0;top:16px;z-index:3;padding:5px 14px 4px 16px;font-family:var(--f-ui);font-weight:700;font-size:13px;letter-spacing:.12em;color:#24190b;
+  background:linear-gradient(180deg,#f3d27e,var(--lamp) 60%,#b98a32);clip-path:polygon(0 0,100% 0,calc(100% - 10px) 50%,100% 100%,0 100%);box-shadow:0 6px 16px -6px #000;text-shadow:0 1px 0 rgba(255,240,200,.5)}
+#file.swap-in .ribbon{animation:ribbonIn .7s cubic-bezier(.2,.8,.2,1) .5s both}
+@keyframes ribbonIn{from{transform:translateX(-105%)}to{transform:none}}
+
+/* ================= late-night mode: an amber lamp turned down ================= */
+.nightglass{position:fixed;inset:0;z-index:99;pointer-events:none;opacity:0;transition:opacity 2.4s var(--ease);background:#ffb062;mix-blend-mode:multiply}
+.nightglass::after{content:"";position:absolute;inset:0;background:#000;opacity:.3}
+html.late .nightglass{opacity:.62}
+.setrow select.pick{flex:none;font-family:var(--f-ui);font-size:15px;letter-spacing:.04em;color:var(--paper);background:color-mix(in srgb,var(--ink) 60%,transparent);border:1px solid var(--rule-hi);border-radius:var(--r-sm);padding:8px 10px;max-width:42%}
+.setrow select.pick:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
+
+/* ================= story card viewer ================= */
+.cardview{position:fixed;inset:0;z-index:48;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(56px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));
+  background:radial-gradient(70% 50% at 50% 40%,rgba(60,44,24,.6),rgba(4,7,5,.96));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:fadeIn .3s var(--ease) both}
+.cardview.closing{animation:fadeIn .22s var(--ease) reverse both}
+.cvin{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:420px}
+.cvframe{position:relative;width:min(100%,calc((100dvh - 210px) * .8));aspect-ratio:4/5;border-radius:6px;overflow:hidden;background:var(--folder);
+  box-shadow:0 0 0 1px rgba(240,207,122,.25),0 30px 70px -20px #000,0 0 60px -20px rgba(240,190,90,.35);animation:printIn .7s cubic-bezier(.16,1,.3,1) both}
+@keyframes printIn{from{opacity:0;transform:translateY(30px) rotate(-2.5deg) scale(.94)}to{opacity:1;transform:none}}
+.cvframe img{display:block;width:100%;height:100%;object-fit:cover;opacity:0;filter:brightness(1.8) saturate(0) blur(4px);transition:opacity .4s,filter 1.4s cubic-bezier(.16,.8,.2,1)}
+.cvframe img.on{opacity:1;filter:none}
+.cvwait{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.cvwait .sk{position:absolute;inset:0;border-radius:0}
+.cvwait .sk-text{position:relative;font-family:var(--f-ui);font-size:15px}
+.cvact{display:flex;gap:10px;width:100%}
+.cvact button{flex:1;justify-content:center;min-height:50px;font-size:16px}
+.cv-close{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px))}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}.file .hero,#article img{opacity:1;transform:none}}
 </style>
 </head>
@@ -721,6 +773,11 @@ button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-ev
   </header>
 
   <main class="view" id="view-tonight">
+  <button class="tcase" id="tcase" type="button" hidden>
+    <span class="tcThumb"><img id="tcImg" alt=""><span class="tcIcon" id="tcIcon"></span></span>
+    <span class="tcTx"><small><i class="pip" aria-hidden="true"></i>Tonight’s case · <span id="tcDate"></span></small><b id="tcTitle"></b><em id="tcSub">Everyone’s reading this one tonight</em></span>
+    <span class="tcGo" aria-hidden="true">›</span>
+  </button>
   <button class="ctx" id="ctxBtn" type="button" aria-label="Change category or era"><b><span id="catLabel"></span> · <span id="eraLabel"></span></b><span class="go">Change ›</span></button>
 
   <section class="file" id="file" aria-live="polite">
@@ -737,6 +794,7 @@ button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-ev
       <div class="heroBox" id="heroBox" hidden>
         <div class="heroCam"><img class="hero" id="hero" alt=""></div>
         <div class="flash" aria-hidden="true"></div>
+        <span class="ribbon" id="ribbon" hidden>Tonight’s case</span>
         <span class="caseno" id="caseno"></span>
         <div class="heroCap">
           <div class="meta"><span class="tag" id="cat"></span><span class="mi" id="mins"></span><span class="mi" id="year"></span></div>
@@ -752,6 +810,7 @@ button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-ev
           <button class="primary" id="read" type="button">Read full story</button>
           <button class="iconbtn" id="another" type="button" aria-label="Different story" title="Different story"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4.5V11h-6.5"/></svg></button>
           <button class="iconbtn" id="save" type="button" aria-pressed="false" aria-label="Save story" title="Save story"><svg class="ic star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2l2.6 5.6 6.1.7-4.5 4.2 1.2 6.1L12 16.8l-5.4 3 1.2-6.1-4.5-4.2 6.1-.7z"/></svg></button>
+          <button class="iconbtn" id="shareStory" type="button" aria-label="Share as a picture" title="Share as a picture"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14.5V3.5M8 7.5l4-4 4 4"/><path d="M8.5 10.5H6.5A1.5 1.5 0 0 0 5 12v7.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V12a1.5 1.5 0 0 0-1.5-1.5h-2"/></svg></button>
         </div>
       </div>
     </div>
@@ -801,6 +860,8 @@ button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-ev
     <section class="block">
       <div class="setrow"><div class="lbl"><b>Text size</b><small>For stories and articles</small></div><div class="ctl"><button class="small" id="smaller" type="button" aria-label="Smaller text">A−</button><output id="sizeOut"></output><button class="small" id="bigger" type="button" aria-label="Larger text">A+</button></div></div>
       <div class="setrow"><div class="lbl"><b>Calm mode</b><small>Turn off animations and transitions</small></div><button class="switch" id="calmSw" type="button" role="switch" aria-checked="false" aria-label="Calm mode"></button></div>
+      <div class="setrow"><div class="lbl"><b>Late-night mode</b><small>Warmer, dimmer screen from this time until 6 AM</small></div><select class="pick" id="lateSel" aria-label="Late-night mode starts">
+        <option value="-1">Off</option><option value="21">9 PM</option><option value="22">10 PM</option><option value="23">11 PM</option><option value="0">Midnight</option><option value="100">Always</option></select></div>
       <div class="setrow"><div class="lbl"><b>Recent stories</b><small>Clear the list of stories you've opened</small></div><button class="small" id="clearRecent" type="button">Clear</button></div>
       <div class="setrow"><div class="lbl"><b id="getAppT">Install the app</b><small id="getAppS">Add Night File to your app drawer</small></div><button class="small" id="getApp" type="button">Install</button></div>
     </section>
@@ -814,6 +875,14 @@ button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-ev
 <div class="splash" id="splash" aria-hidden="true"><div class="spfog"></div><div class="flare"></div><div class="sp"><div class="rules"><i></i><b>◆</b><i></i></div><div class="nm"><span class="gold">Night <i>·</i> File</span></div><div class="sb">CASE FILES · AFTER DARK</div></div><div class="bars"><i></i><i></i></div></div>
 <div class="progress" id="progress" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="nightglass" id="nightglass" aria-hidden="true"></div>
+<div class="cardview" id="cardview" hidden role="dialog" aria-modal="true" aria-label="Story card">
+  <div class="cvin">
+    <div class="cvframe" id="cvFrame"><img id="cvImg" alt="Story card"><div class="cvwait" id="cvWait"><div class="sk"></div><p class="sk-text">Developing the print…</p></div></div>
+    <div class="cvact"><button class="primary" id="cvShare" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14.5V3.5M8 7.5l4-4 4 4"/><path d="M8.5 10.5H6.5A1.5 1.5 0 0 0 5 12v7.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V12a1.5 1.5 0 0 0-1.5-1.5h-2"/></svg>Share</button><button id="cvSave" type="button">Save image</button></div>
+  </div>
+  <button class="iconbtn cv-close" id="cvClose" type="button" aria-label="Close">✕</button>
+</div>
 <nav class="tabbar" aria-label="Sections">
   <div class="in">
     <span class="tabind" aria-hidden="true"></span>
@@ -1082,6 +1151,7 @@ function showCard(c){
   const prev = backStack[backStack.length - 1];
   el("back").hidden = !prev;
   if(prev) el("backTitle").textContent = prev.item.title;
+  renderTonight();
 }
 function sectionIconFor(label){
   const sec = SECTIONS.find(([, g]) => Object.values(g).some(x => x.label === label));
@@ -1792,7 +1862,7 @@ el("back").addEventListener("click", () => {
 });
 // our own history.back() calls (closing a sheet or photo) should not count as "go back a story"
 let ignorePop = false;
-addEventListener("popstate", () => { if(ignorePop){ ignorePop = false; return; } if((browsePage || eraFor) && currentView === "browse"){ if(browseDepth) browseDepth--; browseBack(); return; } if(sheetKind){ closeSheet(true); return; } if(!el("lightbox").hidden){ closeLightbox(true); return; } if(backStack.length) goBack(); });
+addEventListener("popstate", () => { if(ignorePop){ ignorePop = false; return; } if(!el("cardview").hidden){ closeCard(true); return; } if((browsePage || eraFor) && currentView === "browse"){ if(browseDepth) browseDepth--; browseBack(); return; } if(sheetKind){ closeSheet(true); return; } if(!el("lightbox").hidden){ closeLightbox(true); return; } if(backStack.length) goBack(); });
 
 // brass progress line, and the tab bar steps aside while reading
 let lastY = scrollY, scrollRaf = 0;
@@ -2080,6 +2150,264 @@ el("getApp").addEventListener("click", async () => {
   try{ await navigator.clipboard.writeText(INSTALL_URL); toast("Download link copied"); }catch(e){ toast(INSTALL_URL); }
 });
 syncGetApp();
+/* ---------- late-night mode: warmer, dimmer screen from a set time until 6 AM ---------- */
+if(state.lateNight === undefined) state.lateNight = 22;
+function lateActive(){
+  const h = +state.lateNight;
+  if(h < 0) return false;
+  if(h === 100) return true;
+  const d = new Date(), m = d.getHours() * 60 + d.getMinutes(), start = h * 60, end = 6 * 60;
+  return start > end ? (m >= start || m < end) : (m >= start && m < end);
+}
+function applyLate(){ document.documentElement.classList.toggle("late", lateActive()); }
+el("lateSel").value = String(state.lateNight);
+el("lateSel").addEventListener("change", () => {
+  state.lateNight = +el("lateSel").value; save(); applyLate();
+  const opt = el("lateSel").selectedOptions[0].textContent;
+  toast(state.lateNight < 0 ? "Late-night mode off" : lateActive() ? "Late-night mode is on" : "Late-night mode starts at " + opt);
+});
+applyLate();
+setInterval(applyLate, 60000);
+document.addEventListener("visibilitychange", () => { if(!document.hidden){ applyLate(); refreshTonight(); } });
+
+/* ---------- tonight's case: one story a day, the same for everyone ---------- */
+const dayKey = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+// a fixed hash, so every phone turns the same date into the same picks
+function mix(a, b){
+  let h = (Math.imul(a ^ 0x9e3779b9, 2654435761) ^ Math.imul(b + 0x7f4a7c15, 2246822519)) >>> 0;
+  h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0; h = Math.imul(h ^ (h >>> 13), 3266489909) >>> 0;
+  return (h ^ (h >>> 16)) >>> 0;
+}
+async function pickTonight(key){
+  const seed = +key.replace(/-/g, "");
+  const cats = SURPRISE.filter(k => CATS[k].q && CATS[k].q.length).sort();
+  for(let t = 0; t < 6; t++){
+    const cat = CATS[cats[mix(seed, t) % cats.length]];
+    const q = cat.q[mix(seed, 100 + t) % cat.q.length];
+    // no random offset here: the plain search gives every phone the same list
+    const j = await api({action:"query", list:"search", srsearch:q, srnamespace:0, srlimit:50, srprop:"size|wordcount"});
+    const pool = (j.query.search || []).filter(r => !BLOCK.test(r.title) && !BLOCK_DATE.test(r.title) && r.size >= 12000)
+      .sort((a, b) => a.title < b.title ? -1 : a.title > b.title ? 1 : 0);
+    if(!pool.length) continue;
+    const start = mix(seed, 200 + t) % pool.length;
+    const picks = [...new Set([0, 1, 2, 3, 4, 5, 6, 7].map(i => pool[(start + i * 5) % pool.length].title))];
+    const got = await details(picks);
+    const ok = picks.map(tt => got.find(d => d.title === tt)).find(d => d && !NOT_A_STORY.test(d.desc) && !BLOCK.test(d.title));
+    if(ok){ const w = pool.find(r => r.title === ok.title); return Object.assign(ok, {cat:cat.label, words: w ? w.wordcount : 0}); }
+  }
+  return null;
+}
+let tonightJob = null;
+function refreshTonight(){
+  const key = dayKey();
+  if(state.tonight && state.tonight.date === key && state.tonight.item){ renderTonight(); return Promise.resolve(state.tonight.item); }
+  if(tonightJob) return tonightJob;
+  tonightJob = pickTonight(key)
+    .then(item => { if(item){ state.tonight = {date:key, item}; save(); } renderTonight(); return item; })
+    .catch(() => { renderTonight(); return null; })
+    .finally(() => { tonightJob = null; });
+  return tonightJob;
+}
+function tonightItem(){ return state.tonight && state.tonight.date === dayKey() ? state.tonight.item : null; }
+function renderTonight(){
+  const t = tonightItem(), b = el("tcase");
+  if(!t){ b.hidden = true; el("ribbon").hidden = true; return; }
+  b.hidden = false;
+  el("tcTitle").textContent = t.title;
+  el("tcDate").textContent = new Date().toLocaleDateString(undefined, {month:"short", day:"numeric"});
+  el("tcIcon").innerHTML = sectionIconFor(t.cat);
+  const img = el("tcImg");
+  if(t.thumb){ if(img.getAttribute("src") !== t.thumb){ img.classList.remove("loaded"); img.onload = () => img.classList.add("loaded"); img.onerror = () => img.classList.remove("loaded"); img.src = t.thumb; } }
+  else { img.removeAttribute("src"); img.classList.remove("loaded"); }
+  const now = !!(state.current && state.current.title === t.title), read = isSeen(t.title);
+  b.classList.toggle("now", now); b.classList.toggle("read", read && !now);
+  el("tcSub").textContent = now ? "Open below · everyone’s reading it tonight" : read ? "✓ Read · everyone’s reading it tonight" : "Everyone’s reading this one tonight";
+  el("ribbon").hidden = !now;
+}
+el("tcase").addEventListener("click", () => {
+  const t = tonightItem(); if(!t || busy) return;
+  if(currentView !== "tonight") showView("tonight", true);
+  if(state.current && state.current.title === t.title){ el("file").scrollIntoView({behavior: reduce() ? "auto" : "smooth", block:"start"}); return; }
+  window.scrollTo({top:0, behavior: reduce() ? "auto" : "smooth"});
+  present(Object.assign({}, t));
+});
+
+/* ---------- story card: a poster-style picture of the story to share ---------- */
+function loadImg(src){
+  return new Promise(res => {
+    if(!src) return res(null);
+    const i = new Image(); i.crossOrigin = "anonymous";
+    const t = setTimeout(() => res(null), 8000);
+    i.onload = () => { clearTimeout(t); res(i); }; i.onerror = () => { clearTimeout(t); res(null); };
+    i.src = src;
+  });
+}
+function spW(cx, text, sp){ const ch = [...text]; return ch.reduce((a, c) => a + cx.measureText(c).width, 0) + sp * (ch.length - 1); }
+// canvas letter-spacing isn't everywhere yet, so space the letters by hand
+function spaced(cx, text, x, y, sp, align){
+  const w = spW(cx, text, sp);
+  let px = align === "center" ? x - w / 2 : align === "right" ? x - w : x;
+  cx.textAlign = "left";
+  for(const ch of text){ cx.fillText(ch, px, y); px += cx.measureText(ch).width + sp; }
+  return w;
+}
+function wrapLines(cx, text, maxW, maxLines){
+  const lines = []; let cur = "";
+  for(const w of String(text).split(/\s+/)){ const t = cur ? cur + " " + w : w; if(cx.measureText(t).width <= maxW || !cur) cur = t; else { lines.push(cur); cur = w; } }
+  if(cur) lines.push(cur);
+  if(lines.length <= maxLines) return lines;
+  const keep = lines.slice(0, maxLines); let last = keep[maxLines - 1] + " " + lines[maxLines];
+  while(cx.measureText(last + "…").width > maxW && last.includes(" ")) last = last.replace(/\s+\S+$/, "");
+  keep[maxLines - 1] = last.replace(/[,;:.\s–—-]+$/, "") + "…";
+  return keep;
+}
+async function drawStoryCard(c, withIcon){
+  const W = 1080, H = 1350, PH = 830, M = 72;
+  const SERIF = '"Source Serif 4", Georgia, serif', CAPS = '"Alegreya Sans SC", "Trebuchet MS", sans-serif';
+  try{ await Promise.all(['700 80px "Source Serif 4"', 'italic 400 36px "Source Serif 4"', '400 34px "Source Serif 4"', '700 30px "Alegreya Sans SC"', '500 30px "Alegreya Sans SC"'].map(f => document.fonts.load(f))); }catch(e){}
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const cx = cv.getContext("2d");
+  const gold = (y0, y1) => { const g = cx.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, "#fff0c4"); g.addColorStop(.38, "#f1cf7c"); g.addColorStop(.52, "#b5863a"); g.addColorStop(.7, "#e2bb66"); g.addColorStop(1, "#f6dc96"); return g; };
+  let g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#1d3426"); g.addColorStop(.6, "#2a2018"); g.addColorStop(1, "#1c150f");
+  cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+  const img = await loadImg(c.thumb);
+  if(img){
+    const k = Math.max(W / img.naturalWidth, PH / img.naturalHeight) * 1.04, iw = img.naturalWidth * k, ih = img.naturalHeight * k;
+    cx.save(); cx.filter = "sepia(.22) saturate(.8) contrast(1.06) brightness(.9)"; cx.drawImage(img, (W - iw) / 2, (PH - ih) * .4, iw, ih); cx.restore();
+  } else {
+    cx.save(); cx.globalAlpha = .045; cx.strokeStyle = "#ffe8c8"; cx.lineWidth = 3;
+    for(let x = -PH; x < W; x += 26){ cx.beginPath(); cx.moveTo(x, 0); cx.lineTo(x + PH, PH); cx.stroke(); }
+    cx.restore();
+    const cy = PH * .42, rg = cx.createRadialGradient(W / 2, cy, 0, W / 2, cy, 300);
+    rg.addColorStop(0, "rgba(240,190,100,.22)"); rg.addColorStop(1, "rgba(240,190,100,0)"); cx.fillStyle = rg; cx.fillRect(0, 0, W, PH);
+    cx.beginPath(); cx.arc(W / 2, cy, 112, 0, Math.PI * 2); cx.fillStyle = "rgba(10,16,12,.65)"; cx.fill(); cx.lineWidth = 3; cx.strokeStyle = "rgba(201,154,69,.85)"; cx.stroke();
+    if(withIcon){
+      const svg = sectionIconFor(c.cat).replace(/<svg[^>]*>/, '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f0cf7a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">');
+      const ic = await loadImg("data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg));
+      if(ic) cx.drawImage(ic, W / 2 - 64, cy - 64, 128, 128);
+    }
+    cx.save(); cx.translate(W - 210, 190); cx.rotate(.14); cx.font = "700 34px " + CAPS;
+    cx.fillStyle = "rgba(208,128,94,.62)"; const sw = spaced(cx, "CASE FILE", 0, 12, 6, "center");
+    cx.strokeStyle = "rgba(208,128,94,.5)"; cx.lineWidth = 4; cx.strokeRect(-sw / 2 - 18, -30, sw + 36, 58); cx.restore();
+  }
+  // film grade: dark at the top for the nameplate, deep at the bottom for the title
+  g = cx.createLinearGradient(0, 0, 0, PH);
+  g.addColorStop(0, "rgba(8,6,4,.66)"); g.addColorStop(.2, "rgba(8,6,4,0)"); g.addColorStop(.42, "rgba(20,15,10,0)"); g.addColorStop(.74, "rgba(28,21,15,.74)"); g.addColorStop(1, "#241b14");
+  cx.fillStyle = g; cx.fillRect(0, 0, W, PH);
+  cx.fillStyle = "#241b14"; cx.fillRect(0, PH, W, H - PH);
+  g = cx.createRadialGradient(W / 2, PH, 0, W / 2, PH, 760); g.addColorStop(0, "rgba(240,180,90,.08)"); g.addColorStop(1, "rgba(240,180,90,0)");
+  cx.fillStyle = g; cx.fillRect(0, PH, W, H - PH);
+  cx.textBaseline = "alphabetic";
+  // nameplate and case number
+  cx.font = "700 40px " + SERIF; cx.fillStyle = gold(64, 102);
+  cx.shadowColor = "rgba(0,0,0,.75)"; cx.shadowBlur = 14; cx.shadowOffsetY = 2;
+  spaced(cx, "NIGHT · FILE", M, 102, 10, "left");
+  cx.shadowBlur = 0; cx.shadowOffsetY = 0;
+  cx.font = "500 30px " + CAPS; const no = "No. " + caseNo(c.title), nw = spW(cx, no, 3);
+  cx.fillStyle = "rgba(10,8,5,.55)"; cx.beginPath(); cx.roundRect(W - M - nw - 36, 60, nw + 36, 56, 6); cx.fill();
+  cx.strokeStyle = "rgba(240,207,122,.32)"; cx.lineWidth = 2; cx.stroke();
+  cx.fillStyle = "#f0cf7a"; spaced(cx, no, W - M - 18, 98, 3, "right");
+  const tonight = tonightItem();
+  if(tonight && tonight.title === c.title){
+    cx.font = "700 28px " + CAPS; const label = "TONIGHT’S CASE · " + new Date().toLocaleDateString(undefined, {month:"short", day:"numeric"}).toUpperCase(), lw = spW(cx, label, 4);
+    cx.fillStyle = gold(150, 202); cx.beginPath(); cx.moveTo(0, 150); cx.lineTo(M + lw + 44, 150); cx.lineTo(M + lw + 28, 176); cx.lineTo(M + lw + 44, 202); cx.lineTo(0, 202); cx.closePath(); cx.fill();
+    cx.fillStyle = "#24190b"; spaced(cx, label, M, 186, 4, "left");
+  }
+  // title, as large as fits in three lines
+  let fs = 100, lines;
+  do { cx.font = "700 " + fs + "px " + SERIF; lines = wrapLines(cx, c.title, W - M * 2, 9); if(lines.length <= 3) break; fs -= 4; } while(fs > 56);
+  if(lines.length > 3) lines = wrapLines(cx, c.title, W - M * 2, 3);
+  const lh = fs * 1.05, ty = PH - 44 - (lines.length - 1) * lh;
+  cx.fillStyle = "#f6eedb"; cx.shadowColor = "rgba(0,0,0,.8)"; cx.shadowBlur = 34;
+  lines.forEach((l, i) => cx.fillText(l, M, ty + i * lh));
+  cx.shadowBlur = 0;
+  // category stamp, read time and year above the title
+  const my = ty - fs * .92 - 22;
+  cx.font = "700 28px " + CAPS; const tag = c.cat || "Wikipedia", tw = spW(cx, tag, 2.5);
+  cx.save(); cx.translate(M, my); cx.rotate(-.02);
+  cx.fillStyle = "rgba(18,13,8,.6)"; cx.beginPath(); cx.roundRect(0, -36, tw + 30, 50, 5); cx.fill();
+  cx.strokeStyle = "rgba(212,166,64,.85)"; cx.lineWidth = 2.5; cx.stroke();
+  cx.fillStyle = "#d4a640"; spaced(cx, tag, 15, -2, 2.5, "left"); cx.restore();
+  const yr = storyYear(c.extract || ""), bits = [mins(c.words), yr ? String(yr) : ""].filter(Boolean).join("   ·   ");
+  cx.font = "500 28px " + CAPS; cx.fillStyle = "rgba(246,238,219,.88)"; cx.shadowColor = "rgba(0,0,0,.8)"; cx.shadowBlur = 8;
+  if(bits) spaced(cx, bits, M + tw + 56, my - 2, 2, "left");
+  cx.shadowBlur = 0;
+  // the hook
+  let ly = PH + 76;
+  if(c.desc){
+    cx.font = "italic 400 36px " + SERIF; cx.fillStyle = "#c9bd9f";
+    const dl = wrapLines(cx, smart(c.desc.charAt(0).toUpperCase() + c.desc.slice(1)), W - M * 2, 2);
+    dl.forEach((l, i) => cx.fillText(l, M, ly + i * 48)); ly += dl.length * 48 + 26;
+  }
+  cx.font = "400 34px " + SERIF; cx.fillStyle = "#ede4cf";
+  const room = Math.max(1, Math.floor((H - 168 - ly) / 50));
+  wrapLines(cx, smart(firstSentences(c.extract || "", 3)), W - M * 2, room).forEach((l, i) => cx.fillText(l, M, ly + 6 + i * 50));
+  // footer
+  const fy = H - 124;
+  g = cx.createLinearGradient(M, 0, W - M, 0); g.addColorStop(0, "rgba(201,154,69,0)"); g.addColorStop(.5, "rgba(240,207,122,.9)"); g.addColorStop(1, "rgba(201,154,69,0)");
+  cx.fillStyle = g; cx.fillRect(M, fy, W - M * 2, 2);
+  cx.fillStyle = "#d4a640"; cx.save(); cx.translate(W / 2, fy + 1); cx.rotate(Math.PI / 4); cx.fillRect(-7, -7, 14, 14); cx.restore();
+  cx.font = "500 26px " + CAPS; cx.fillStyle = "#d2c6a9"; spaced(cx, "CASE FILES · AFTER DARK", M, H - 64, 5, "left");
+  cx.fillStyle = "#d4a640"; spaced(cx, "whiskerbiskit.github.io/night-file", W - M, H - 64, 1, "right");
+  // brass hairline frame
+  cx.strokeStyle = "rgba(201,154,69,.5)"; cx.lineWidth = 2; cx.strokeRect(26, 26, W - 52, H - 52);
+  // a little film grain
+  const n = document.createElement("canvas"); n.width = n.height = 128; const nx = n.getContext("2d"), d = nx.createImageData(128, 128);
+  for(let i = 0; i < d.data.length; i += 4){ const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+  nx.putImageData(d, 0, 0);
+  cx.save(); cx.globalAlpha = .07; cx.globalCompositeOperation = "overlay"; cx.fillStyle = cx.createPattern(n, "repeat"); cx.fillRect(0, 0, W, H); cx.restore();
+  return cv;
+}
+let cardBlob = null, cardStory = null;
+const cardName = c => (c.title.replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "story") + "-night-file.jpg";
+async function openCard(){
+  const c = state.current; if(!c) return;
+  const v = el("cardview"), im = el("cvImg");
+  v.hidden = false; v.classList.remove("closing");
+  im.classList.remove("on"); im.removeAttribute("src"); el("cvWait").hidden = false;
+  el("cvShare").disabled = el("cvSave").disabled = true; cardBlob = null; cardStory = c;
+  try{ history.pushState({nfCard: 1}, ""); }catch(e){}
+  let blob = null;
+  for(const icon of [true, false]){   // if a browser won't export the drawn icon, make it without
+    try{
+      const cv = await drawStoryCard(c, icon);
+      blob = await new Promise((res, rej) => { try{ cv.toBlob(b => b ? res(b) : rej(new Error("blob")), "image/jpeg", .92); }catch(e){ rej(e); } });
+      break;
+    }catch(e){}
+  }
+  if(cardStory !== c || v.hidden) return;
+  if(!blob){ closeCard(); toast("Couldn’t make the picture. Try again."); return; }
+  cardBlob = blob;
+  im.onload = () => { el("cvWait").hidden = true; requestAnimationFrame(() => im.classList.add("on")); };
+  im.src = URL.createObjectURL(blob);
+  el("cvShare").disabled = el("cvSave").disabled = false;
+}
+function closeCard(fromPop){
+  const v = el("cardview"); if(v.hidden) return;
+  cardStory = null;
+  v.classList.add("closing");
+  setTimeout(() => { v.hidden = true; v.classList.remove("closing"); const im = el("cvImg"); if(im.src.startsWith("blob:")) URL.revokeObjectURL(im.src); im.removeAttribute("src"); }, reduce() ? 0 : 220);
+  if(!fromPop && history.state && history.state.nfCard){ ignorePop = true; history.back(); }
+}
+function downloadCard(){
+  const a = document.createElement("a"); a.href = URL.createObjectURL(cardBlob); a.download = cardName(cardStory);
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast("Saved to your downloads");
+}
+el("cvShare").addEventListener("click", async () => {
+  if(!cardBlob || !cardStory) return;
+  const file = new File([cardBlob], cardName(cardStory), {type: "image/jpeg"});
+  const text = cardStory.title + ", from Night File. Get the app: " + INSTALL_URL;
+  if(navigator.canShare && navigator.canShare({files: [file]})){ try{ await navigator.share({files: [file], title: cardStory.title, text}); }catch(e){} return; }
+  if(navigator.share){ try{ await navigator.share({title: cardStory.title, text}); }catch(e){} return; }
+  downloadCard();
+});
+el("cvSave").addEventListener("click", () => { if(cardBlob) downloadCard(); });
+el("cvClose").addEventListener("click", () => closeCard());
+el("cardview").addEventListener("click", e => { if(e.target === el("cardview")) closeCard(); });
+addEventListener("keydown", e => { if(e.key === "Escape" && !el("cardview").hidden) closeCard(); });
+el("shareStory").addEventListener("click", openCard);
+setTimeout(refreshTonight, 1800);
 (function iosHint(){
   const ua = navigator.userAgent;
   const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
