@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Get Night File</title>
+<meta name="description" content="Install Night File: dark true stories from Wikipedia, for reading before bed.">
+<meta name="theme-color" content="#0f1c15">
+<meta property="og:title" content="Night File">
+<meta property="og:description" content="Dark true stories, for reading before bed. Tap to install.">
+<meta property="og:image" content="https://whiskerbiskit.github.io/night-file/icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Night File">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="icon" href="../icon-192.png">
+<link rel="apple-touch-icon" href="../icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,ital,wght@8..60,0,400;8..60,0,600;8..60,0,700;8..60,1,400&family=Alegreya+Sans+SC:wght@500;700&display=swap">
+<style>
+:root{
+  --ink:#0f1c15; --deep:#09110c; --glow:#1d3426; --folder:#2a2018; --folder-hi:#33271d; --rule:#4a3b2a;
+  --paper:#ede4cf; --soft:#d2c6a9; --dim:#a89f87; --lamp:#d4a640; --brass:#c99a45; --brass-hi:#f0cf7a;
+  --ease:cubic-bezier(.22,.7,.2,1);
+  --serif:"Source Serif 4","Iowan Old Style",Georgia,serif;
+  --caps:"Alegreya Sans SC","Gill Sans","Trebuchet MS",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--deep)}
+body{margin:0;min-height:100vh;min-height:100dvh;color:var(--paper);font-family:var(--serif);font-size:18px;line-height:1.55;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(28px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  background:radial-gradient(70% 38% at 50% -6%,rgba(224,150,70,.18),transparent 70%),radial-gradient(120% 70% at 50% -10%,var(--glow) 0%,var(--ink) 55%,var(--deep) 100%) fixed,var(--ink);overflow-x:hidden}
+body::after{content:"";position:fixed;inset:-50%;pointer-events:none;z-index:5;opacity:.07;mix-blend-mode:overlay;animation:grain 1.1s steps(1) infinite;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-4%,3%)}50%{transform:translate(3%,-5%)}75%{transform:translate(5%,4%)}}
+.lamp{position:fixed;left:50%;top:-14vh;width:130vw;height:56vh;transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(236,160,72,.16),rgba(236,160,72,.05) 55%,transparent);animation:candle 7s ease-in-out infinite}
+@keyframes candle{0%,100%{opacity:.75}30%{opacity:1}60%{opacity:.85}}
+.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 90% 80% at 50% 42%,transparent 50%,rgba(0,0,0,.6) 100%)}
+main{position:relative;z-index:1;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
+.icon{width:116px;height:116px;border-radius:28px;display:block;box-shadow:0 0 0 1px rgba(240,207,122,.3),0 0 50px -6px rgba(240,190,90,.45),0 24px 40px -18px #000;animation:float 6s ease-in-out infinite, rise .9s var(--ease) both}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.orn{display:flex;align-items:center;gap:10px;color:var(--lamp);font-size:11px}
+.orn::before,.orn::after{content:"";width:46px;height:1px;background:linear-gradient(90deg,transparent,var(--brass-hi))}
+.orn::after{background:linear-gradient(90deg,var(--brass-hi),transparent)}
+h1{margin:0;font-weight:700;font-size:clamp(28px,8.5vw,36px);letter-spacing:.24em;padding-left:.24em;text-transform:uppercase;line-height:1.1;white-space:nowrap;
+  background:linear-gradient(100deg,transparent 0%,transparent 42%,rgba(255,250,230,.95) 50%,transparent 58%,transparent 100%),linear-gradient(180deg,#fff0c4 0%,#f1cf7c 38%,#b5863a 52%,#e2bb66 70%,#f6dc96 100%);
+  background-size:280% 100%,100% 100%;background-position:100% 0,0 0;-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(0,0,0,.65)) drop-shadow(0 0 16px rgba(240,190,90,.25));animation:metal 1.6s cubic-bezier(.3,.6,.2,1) .4s both, rise .9s var(--ease) .1s both}
+@keyframes metal{from{background-position:100% 0,0 0}to{background-position:0 0,0 0}}
+.sub{margin:-12px 0 0;font-family:var(--caps);font-size:12px;letter-spacing:.3em;padding-left:.3em;color:var(--soft);animation:rise .9s var(--ease) .2s both}
+.pitch{margin:0;font-style:italic;color:var(--soft);font-size:17px;max-width:30ch;animation:rise .9s var(--ease) .3s both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.card{width:100%;padding:20px 18px;border-radius:14px;display:flex;flex-direction:column;gap:14px;animation:rise .9s var(--ease) .4s both;
+  background:repeating-linear-gradient(92deg,rgba(255,235,200,.014) 0 2px,transparent 2px 9px),linear-gradient(180deg,rgba(51,39,29,.85),rgba(42,32,24,.9));
+  border:1px solid color-mix(in srgb,var(--brass) 30%,var(--rule));box-shadow:inset 0 1px 0 rgba(255,226,170,.13),0 22px 46px -26px #000;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;padding:14px 18px;border-radius:8px;
+  font-family:var(--caps);font-weight:700;font-size:19px;letter-spacing:.07em;color:#24190b;text-shadow:0 1px 0 rgba(255,240,200,.55);
+  background:linear-gradient(180deg,#f3d27e 0%,#e2b552 30%,var(--lamp) 58%,#a8782a 100%);border:1px solid #8f6524;
+  box-shadow:inset 0 1px 0 rgba(255,246,214,.75),inset 0 -2px 0 rgba(90,60,20,.45),0 10px 26px -8px rgba(212,166,64,.6),0 0 34px -10px rgba(240,190,90,.5);transition:transform .14s var(--ease),filter .2s}
+.btn:active{transform:scale(.97);filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--brass-hi);outline-offset:3px}
+.btn::after{content:"";position:absolute;inset:-2px;background:linear-gradient(105deg,transparent 35%,rgba(255,246,214,.6) 50%,transparent 65%);transform:translateX(-130%);animation:sheen 3.6s cubic-bezier(.3,.6,.2,1) 1.4s infinite}
+@keyframes sheen{0%{transform:translateX(-130%)}35%,100%{transform:translateX(130%)}}
+.btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn.ghost{color:var(--paper);text-shadow:none;background:transparent;border-color:var(--rule);box-shadow:inset 0 1px 0 rgba(255,226,170,.08);font-size:16px;min-height:48px}
+.btn.ghost::after{display:none}
+.note{margin:0;font-size:15px;color:var(--soft);line-height:1.5}
+.note b{color:var(--paper);font-weight:600}
+ol.steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;text-align:left;counter-reset:s}
+ol.steps li{position:relative;padding:2px 0 0 38px;min-height:28px;font-size:16px;line-height:1.45;counter-increment:s}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--caps);font-size:14px;font-weight:700;color:#24190b;background:linear-gradient(180deg,#f0cf7a,var(--lamp))}
+.ic{display:inline-block;width:18px;height:18px;vertical-align:-3px;stroke:var(--lamp);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.done{display:flex;flex-direction:column;align-items:center;gap:10px}
+.check{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--brass);box-shadow:0 0 30px -6px rgba(240,190,90,.6);color:var(--brass-hi)}
+.check svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:30;stroke-dashoffset:30;animation:draw .6s var(--ease) .2s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.done b{font-size:21px;font-weight:600}
+.foot{font-family:var(--caps);font-size:13px;letter-spacing:.06em;color:var(--dim);animation:rise .9s var(--ease) .55s both}
+.foot a{color:var(--lamp);text-decoration:none}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="lamp" aria-hidden="true"></div><div class="vignette" aria-hidden="true"></div>
+<main>
+  <img class="icon" src="../icon-512.png" alt="Night File app icon" width="116" height="116">
+  <div class="orn" aria-hidden="true">◆</div>
+  <h1>Night · File</h1>
+  <p class="sub">CASE FILES · AFTER DARK</p>
+  <p class="pitch">Dark true stories from Wikipedia, one a night, for reading before bed.</p>
+
+  <section class="card" aria-live="polite">
+    <!-- Android / desktop Chrome, Edge, Samsung Internet: real one-tap install -->
+    <div id="vInstall" hidden>
+      <button class="btn" id="installBtn" type="button"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/></svg>Install Night File</button>
+    </div>
+    <p class="note" id="vInstallNote" hidden>Free · No account · Adds to your app drawer and home screen</p>
+
+    <!-- installed just now -->
+    <div class="done" id="vDone" hidden>
+      <div class="check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <b>Installed</b>
+      <p class="note">Night File is in your app drawer. Open it from there any time.</p>
+    </div>
+
+    <!-- iPhone / iPad -->
+    <ol class="steps" id="vIos" hidden>
+      <li id="iosSafari" hidden>Open this page in <b>Safari</b> (it won't work from inside another app).</li>
+      <li>Tap the <b>Share</b> button <svg class="ic" viewBox="0 0 24 24"><path d="M12 15V3.5M8 7.5l4-4 4 4"/><path d="M8.5 11H6.5A1.5 1.5 0 0 0 5 12.5v7A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-7a1.5 1.5 0 0 0-1.5-1.5h-2"/></svg> at the bottom of the screen.</li>
+      <li>Scroll down and tap <b>Add to Home Screen</b>.</li>
+      <li>Tap <b>Add</b>. Night File appears on your home screen.</li>
+    </ol>
+
+    <!-- anything else (in-app browsers, Firefox, or the install prompt not offered yet) -->
+    <ol class="steps" id="vManual" hidden>
+      <li id="openChrome" hidden>Open this link in <b>Chrome</b> or <b>Samsung Internet</b> (tap ⋮ and choose <b>Open in browser</b>).</li>
+      <li>Tap the browser menu <b>⋮</b> or <b>≡</b>.</li>
+      <li>Choose <b>Install app</b> or <b>Add page to → Home screen</b>.</li>
+    </ol>
+
+    <a class="btn ghost" id="openBtn" href="../">Open in the browser instead</a>
+  </section>
+  <p class="foot"><button class="btn ghost" id="shareBtn" type="button" hidden style="font-size:14px;min-height:40px;padding:8px 14px;width:auto">Share this link</button></p>
+</main>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const ua = navigator.userAgent;
+const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const inApp = /FBAN|FBAV|Instagram|Snapchat|Line\/|GSA\/|; wv\)|CriOS|FxiOS|EdgiOS/.test(ua);
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const APP = new URL("../", location.href).href;
+let deferred = null;
+
+// Opened from the installed app: just go to it.
+if(standalone) location.replace(APP);
+
+function show(view){
+  ["vInstall","vInstallNote","vDone","vIos","vManual"].forEach(id => $(id).hidden = true);
+  if(view === "install"){ $("vInstall").hidden = false; $("vInstallNote").hidden = false; $("openBtn").textContent = "Open in the browser instead"; }
+  if(view === "done"){ $("vDone").hidden = false; $("openBtn").textContent = "Open Night File"; }
+  if(view === "ios"){ $("vIos").hidden = false; $("iosSafari").hidden = !inApp; }
+  if(view === "manual"){ $("vManual").hidden = false; $("openChrome").hidden = !inApp; }
+}
+
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; show("install"); });
+addEventListener("appinstalled", () => { deferred = null; show("done"); });
+$("installBtn").addEventListener("click", async () => {
+  if(!deferred){ show("manual"); return; }
+  deferred.prompt();
+  const r = await deferred.userChoice.catch(() => null);
+  deferred = null;
+  if(r && r.outcome === "accepted") show("done");
+});
+
+// Until the browser offers its install button, show the steps that fit this phone.
+show(ios ? "ios" : "manual");
+
+if(navigator.share){
+  $("shareBtn").hidden = false;
+  $("shareBtn").addEventListener("click", () => navigator.share({title: "Night File", text: "Dark true stories for reading before bed.", url: location.href}).catch(() => {}));
+}
+
+// The app's offline worker makes it installable; register it here too so the first visit counts.
+if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("../sw.js", {scope: "../", updateViaCache: "none"}).catch(() => {});
+</script>
+</body>
+</html>

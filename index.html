@@ -802,6 +802,7 @@ button.primary::before{content:"";position:absolute;inset:0;z-index:0;pointer-ev
       <div class="setrow"><div class="lbl"><b>Text size</b><small>For stories and articles</small></div><div class="ctl"><button class="small" id="smaller" type="button" aria-label="Smaller text">A−</button><output id="sizeOut"></output><button class="small" id="bigger" type="button" aria-label="Larger text">A+</button></div></div>
       <div class="setrow"><div class="lbl"><b>Calm mode</b><small>Turn off animations and transitions</small></div><button class="switch" id="calmSw" type="button" role="switch" aria-checked="false" aria-label="Calm mode"></button></div>
       <div class="setrow"><div class="lbl"><b>Recent stories</b><small>Clear the list of stories you've opened</small></div><button class="small" id="clearRecent" type="button">Clear</button></div>
+      <div class="setrow"><div class="lbl"><b id="getAppT">Install the app</b><small id="getAppS">Add Night File to your app drawer</small></div><button class="small" id="getApp" type="button">Install</button></div>
     </section>
     <section class="block">
       <h3>About</h3>
@@ -2058,6 +2059,27 @@ function burstSave(){
   const d = el("savedDot"); setTimeout(() => { d.classList.remove("pop"); void d.offsetWidth; d.classList.add("pop"); }, 60);
   if(navigator.vibrate) try{ navigator.vibrate([8, 40, 12]); }catch(err){}
 }
+/* ---------- install / share the download link ---------- */
+const INSTALL_URL = new URL("install/", location.href).href;
+let installPrompt = null;
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+function syncGetApp(){
+  const app = isStandalone();
+  el("getAppT").textContent = app ? "Share Night File" : "Install the app";
+  el("getAppS").textContent = app ? "Send the download link to a friend" : "Add Night File to your app drawer";
+  el("getApp").textContent = app ? "Share" : "Install";
+}
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; });
+addEventListener("appinstalled", () => { installPrompt = null; toast("Installed. Night File is in your app drawer."); });
+el("getApp").addEventListener("click", async () => {
+  if(!isStandalone()){
+    if(installPrompt){ installPrompt.prompt(); await installPrompt.userChoice.catch(() => null); installPrompt = null; return; }
+    location.href = INSTALL_URL; return;   // the install page walks through it for this phone
+  }
+  if(navigator.share){ navigator.share({title:"Night File", text:"Dark true stories for reading before bed.", url:INSTALL_URL}).catch(() => {}); return; }
+  try{ await navigator.clipboard.writeText(INSTALL_URL); toast("Download link copied"); }catch(e){ toast(INSTALL_URL); }
+});
+syncGetApp();
 (function iosHint(){
   const ua = navigator.userAgent;
   const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
