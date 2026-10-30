@@ -873,7 +873,7 @@ const SECTIONS = [
   ["The unexplained", {
     unexplained:{label:"Strange deaths & disappearances", q:[C("Unsolved deaths in the United States|Unsolved deaths in Russia|Unsolved deaths in Alaska|Death conspiracy theories|1990s missing person cases|2000s missing person cases|2010s missing person cases|Missing person cases in California")]},
     ufo:      {label:"UFOs & aliens", q:[C("UFO sightings in the United States|UFO sightings|Alleged extraterrestrial encounters|UFO crashes|Aviation incidents involving UFOs and military aircraft|Alien abduction reports|Alien abductions"), 'UFO incident sighting witnesses']},
-    haunted:  {label:"Hauntings & exorcisms", q:[C("Poltergeists|Paranormal hoaxes|English ghosts"), C("Reportedly haunted locations in California|Reportedly haunted locations in New York (state)|Reportedly haunted locations in Texas|Reportedly haunted locations in Kentucky|Reportedly haunted locations in Philadelphia|Reportedly haunted locations in London|Reportedly haunted locations in Scotland|Reportedly haunted locations in Ohio|Reportedly haunted locations in Pennsylvania|Reportedly haunted locations in England")]},
+    haunted:  {label:"Hauntings & exorcisms", q:[C("Poltergeists|Paranormal hoaxes"), C("Reportedly haunted locations in California|Reportedly haunted locations in New York (state)|Reportedly haunted locations in Texas|Reportedly haunted locations in Kentucky|Reportedly haunted locations in Philadelphia|Reportedly haunted locations in London|Reportedly haunted locations in Scotland|Reportedly haunted locations in Ohio|Reportedly haunted locations in Pennsylvania|Reportedly haunted locations in England")]},
     hysteria: {label:"Mass hysteria", q:[C("Mass psychogenic illness|Mass psychogenic illness in Europe|Satanic ritual abuse hysteria|Witch trials|Witch trials in the United States|Day care sex abuse hysteria")]},
     signals:  {label:"Strange signals", q:[C("Numbers stations|Pirate television|Broadcast signal intrusions|Unidentified radio signals")]},
     ghost:    {label:"Ghost ships", q:[C("Ghost ships|Mass disappearances|Missing ships|Ships lost with all hands")]},
@@ -938,6 +938,11 @@ const BLOCK = /dahmer|\bgein\b|^list of|^lists of|\(disambiguation\)|^timeline o
 const BLOCK_DATE = /^(\d{4}|deaths in|(january|february|march|april|may|june|july|august|september|october|november|december) \d{4})\b|^\d{4}( in |s in | deaths)/i;
 // Skip entertainment, fiction and other pages that aren't real stories.
 const NOT_A_STORY = /\b(television|tv series|sitcom|film|novel|video game|album|song|band|franchise|comic|manga|anime|episode|season \d|musical|play by|book series|board game|website|podcast|wrestler|footballer|baseball|basketball|cricketer|rapper|singer|actor|actress|poet|politician|prime minister|king of|queen of|emperor|pharaoh|saint|disciple|ruler|tribe|atoll|lake in|city in|village in|neighborhood in|company|telescope|satellite|cometary|power plant|power station|closed city|icebreaker|stratovolcano|volcanic cone|volcano in|large volcano|active volcano|highest mountain|mountain in|physicist|herpetologist|athlete|businessman|boxer|comedian|organization|nonprofit|laboratory|monument|revolutionary)\b/i;
+// Fiction, folklore and legends: anything made up, even if it's spooky, stays out. Checked against the page's short description and its opening sentence.
+const FICTION = /\b(fictional|fiction|fictitious|creepypasta|urban legends?|legend|legendary creature|folklore|folk ?tales?|fairy tales?|myths?|mythology|mythological|mythical|cryptids?|short story|novella|novelette|alternate reality game|ghost story|horror story|story by|written by|screenplay|literary|character)\b/i;
+const FICTION_TITLE = /\((novel|film|short story|story|character|legend|folklore|creepypasta|book|play|game|series|miniseries|ballad|poem|song)\b[^)]*\)\s*$/i;
+const firstLine = t => (t || "").split(/(?<=[.!?])\s/)[0];
+const madeUp = d => FICTION_TITLE.test(d.title) || FICTION.test(d.desc) || FICTION.test(firstLine(d.extract));
 const SKIP_SECTIONS = /^(references|notes|external links|further reading|see also|bibliography|sources|citations|footnotes|works cited|explanatory notes|notes and references|in popular culture|filmography|gallery)$/i;
 // merged categories: carry old picks and saved stories over to their new homes
 const MERGED_KEYS = {pairs:"serial", medical:"female", kids:"family", wrong:"cold", prison:"mob"};
@@ -1014,11 +1019,11 @@ async function batch(){
     const catKey = state.filters.cat === "any" ? pickOne(SURPRISE.filter(k => catFits(k))) : state.filters.cat;
     const cat = CATS[catKey];
     for(const q of shuffle(cat.q)){
-      const pool = (await searchPool(q)).filter(r => !BLOCK.test(r.title) && !BLOCK_DATE.test(r.title) && !isSeen(r.title) && r.size >= 9000);
+      const pool = (await searchPool(q)).filter(r => !BLOCK.test(r.title) && !BLOCK_DATE.test(r.title) && !FICTION_TITLE.test(r.title) && !isSeen(r.title) && r.size >= 9000);
       if(!pool.length) continue;
       const words = Object.fromEntries(pool.map(r => [r.title, r.wordcount]));
       const top = shuffle(pool.sort((a,b) => b.size - a.size).slice(0, 30)).slice(0, 20).map(r => r.title);
-      let items = (await details(top)).filter(d => !BLOCK.test(d.title) && !isSeen(d.title) && !NOT_A_STORY.test(d.desc));
+      let items = (await details(top)).filter(d => !BLOCK.test(d.title) && !isSeen(d.title) && !NOT_A_STORY.test(d.desc) && !madeUp(d));
       items = items.filter(d => eraOK(d.extract));
       if(items.length){ const mixed = shuffle(items); return [...mixed.filter(d => d.thumb), ...mixed.filter(d => !d.thumb)].map(d => Object.assign(d, {cat:cat.label, words:words[d.title] || 0})); }
     }
