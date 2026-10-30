@@ -846,7 +846,7 @@ const API = "https://en.wikipedia.org/w/api.php";
 const REST = "https://en.wikipedia.org/api/rest_v1/page/html/";
 const el = id => document.getElementById(id);
 const KEY = "nightfile.wiki.v1";
-let state = {seen:[], library:[], current:null, queue:{key:"", items:[]}, filters:{cat:"any", eras:["1990s","2010s"]}, size:18, progress:{}, voice:"", rate:"1"};
+let state = {seen:[], library:[], current:null, queue:{key:"", items:[]}, filters:{cat:"any", eras:["1990s","2010s"]}, size:18, progress:{}, voice:"", rate:"1", listenAt:{}};
 try{ const s = JSON.parse(localStorage.getItem(KEY)||"null"); if(s) state = Object.assign(state, s); }catch(e){}
 const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} };
 const reduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.classList.contains("calm");
@@ -1106,7 +1106,7 @@ function showBanner(c){
 }
 
 let openingTitle = "";
-function clearArticle(){ openingTitle = ""; el("artWait").hidden = true; stopListen(); el("article").innerHTML = ""; el("toc").hidden = true; el("credit").hidden = true; el("after").hidden = true; el("listen").hidden = true; el("lsettings").hidden = true; el("lset").setAttribute("aria-expanded","false"); el("lset").textContent = "Voice settings ▾"; }
+function clearArticle(){ openingTitle = ""; el("artWait").hidden = true; if(tts.cur) remember(); stopListen(); el("article").innerHTML = ""; el("toc").hidden = true; el("credit").hidden = true; el("after").hidden = true; el("listen").hidden = true; el("lsettings").hidden = true; el("lset").setAttribute("aria-expanded","false"); el("lset").textContent = "Voice settings ▾"; }
 
 // Stories you came from by tapping links, newest last.
 let backStack = [];
@@ -1674,7 +1674,7 @@ let openToken = 0;
 async function openArticle(title, restore, y){
   const token = ++openToken;
   clearArticle();
-  openingTitle = title;
+  openingTitle = title; tts.title = title;
   el("read").hidden = true;
   setMsg(""); el("artWait").hidden = false;
   requestAnimationFrame(() => el("artWait").scrollIntoView({behavior: reduce() ? "auto" : "smooth", block: "start"}));
@@ -1828,7 +1828,8 @@ addEventListener("scroll", () => {
 
 /* ---------- listen mode ---------- */
 const synth = "speechSynthesis" in window ? window.speechSynthesis : null;
-let tts = {on:false, blocks:[], bi:0, cur:null, chunks:[], ci:0, timer:0, endAt:0, tick:0};
+let tts = {on:false, blocks:[], bi:0, cur:null, chunks:[], ci:0, timer:0, endAt:0, tick:0, title:"", text:"", word:0, startAt:0};
+if(!state.listenAt || typeof state.listenAt !== "object") state.listenAt = {};
 let voices = [];
 
 function loadVoices(){
@@ -1851,12 +1852,35 @@ function readable(){
   return [...el("article").querySelectorAll("p, li, h2, h3, blockquote")].filter(n =>
     !n.closest(".infobox-wrap, .tablewrap, figure, .gallery") && !(n.tagName === "LI" && n.querySelector("p")) && n.textContent.trim().length > 1);
 }
-function chunk(text){
-  const s = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]+["')\]]*\s*|[^.!?]+$/g) || [text];
-  const out = []; let cur = "";
-  s.forEach(x => { if((cur + x).length > 220 && cur){ out.push(cur); cur = x; } else cur += x; });
-  if(cur.trim()) out.push(cur);
-  return out;
+const squash = t => t.replace(/\s+/g, " ").trim();
+// split a paragraph into sentence-sized pieces, starting at character `from`; each piece knows where it starts
+function chunk(text, from){
+  from = Math.max(0, Math.min(text.length, from || 0));
+  const out = []; let cur = null;
+  for(const m of text.slice(from).matchAll(/[^.!?]+[.!?]+["')\]]*\s*|[^.!?]+$/g)){
+    const at = from + m.index;
+    if(cur && (cur.text + m[0]).length <= 140) cur.text += m[0];
+    else { if(cur) out.push(cur); cur = {s:at, text:m[0]}; }
+  }
+  if(cur) out.push(cur);
+  return out.filter(c => c.text.trim());
+}
+// remember the exact spot per story, so Resume works after pausing, leaving the story, or closing the app
+function remember(){
+  if(!tts.title || !tts.cur) return;
+  const b = tts.blocks.indexOf(tts.cur); if(b < 0) return;
+  const all = state.listenAt; delete all[tts.title];
+  all[tts.title] = {b, t:tts.text.slice(0, 60), c:tts.word};
+  const keys = Object.keys(all); if(keys.length > 30) keys.slice(0, keys.length - 30).forEach(k => delete all[k]);
+  save();
+}
+function forget(){ if(tts.title && state.listenAt[tts.title]){ delete state.listenAt[tts.title]; save(); } }
+function savedSpot(blocks){
+  const sp = state.listenAt[tts.title]; if(!sp) return null;
+  const ok = i => blocks[i] && squash(blocks[i].textContent).startsWith(sp.t);
+  let b = ok(sp.b) ? sp.b : blocks.findIndex((x, i) => ok(i));
+  if(b < 0) b = sp.b < blocks.length ? sp.b : -1;
+  return b < 0 ? null : {b, c: ok(b) ? sp.c : 0};
 }
 function mark(n){ document.querySelectorAll(".speaking").forEach(x => x.classList.remove("speaking")); if(n){ n.classList.add("speaking");
   const r = n.getBoundingClientRect(); if(r.top < 60 || r.bottom > innerHeight - 120) n.scrollIntoView({behavior: reduce() ? "auto" : "smooth", block:"center"}); } }
@@ -1865,10 +1889,15 @@ function firstVisible(blocks){ const i = blocks.findIndex(b => b.getBoundingClie
 function speakNext(){
   if(!tts.on) return;
   while(tts.ci >= tts.chunks.length){
-    if(tts.bi >= tts.blocks.length){ stopListen(); return; }
-    tts.cur = tts.blocks[tts.bi++]; tts.chunks = chunk(tts.cur.textContent); tts.ci = 0; mark(tts.cur);
+    if(tts.bi >= tts.blocks.length){ forget(); stopListen(); return; }
+    tts.cur = tts.blocks[tts.bi++]; tts.text = squash(tts.cur.textContent);
+    tts.chunks = chunk(tts.text, tts.startAt); tts.startAt = 0; tts.ci = 0; mark(tts.cur);
   }
-  const u = new SpeechSynthesisUtterance(tts.chunks[tts.ci++]);
+  const ch = tts.chunks[tts.ci++];
+  tts.word = ch.s; remember();
+  const u = new SpeechSynthesisUtterance(ch.text);
+  // follow along word by word, so a pause resumes on the word you stopped at (sentence start if the phone doesn't report words)
+  u.onboundary = e => { if(tts.on && (!e.name || e.name === "word")) tts.word = ch.s + e.charIndex; };
   const v = voices.find(x => x.name === state.voice);
   if(v){ u.voice = v; u.lang = v.lang; } else u.lang = "en-US";
   u.rate = +state.rate || 1;
@@ -1881,16 +1910,20 @@ function startListen(){
   synth.cancel();
   tts.blocks = readable();
   if(!tts.blocks.length) return;
-  const resumeAt = tts.cur ? tts.blocks.indexOf(tts.cur) : -1;
-  tts.bi = resumeAt >= 0 ? resumeAt : firstVisible(tts.blocks);
+  let bi = tts.cur ? tts.blocks.indexOf(tts.cur) : -1, off = bi >= 0 ? tts.word : 0;
+  if(bi < 0){ const sp = savedSpot(tts.blocks); if(sp){ bi = sp.b; off = sp.c; } }
+  if(bi < 0){ bi = firstVisible(tts.blocks); off = 0; }
+  tts.bi = bi; tts.startAt = off;
   tts.chunks = []; tts.ci = 0; tts.on = true;
   armSleep(); updatePlay(); speakNext();
 }
-function pauseListen(){ tts.on = false; synth && synth.cancel(); updatePlay(); }
+function pauseListen(){ tts.on = false; synth && synth.cancel(); remember(); updatePlay(); }
 function stopListen(){ tts.on = false; if(synth) synth.cancel(); tts.cur = null; mark(null); clearTimeout(tts.timer); clearInterval(tts.tick); tts.endAt = 0; el("left").textContent = ""; updatePlay(); }
 function updatePlay(){
-  el("play").textContent = tts.on ? "❚❚ Pause" : (tts.cur ? "▶ Resume" : "▶ Listen");
-  el("stopL").hidden = !tts.cur;
+  const spot = !tts.cur && !!state.listenAt[tts.title];
+  el("play").textContent = tts.on ? "❚❚ Pause" : (tts.cur || spot ? "▶ Resume" : "▶ Listen");
+  el("stopL").hidden = !tts.cur && !spot;
+  el("stopL").textContent = spot ? "↺ Start over" : "■ Stop";
   // small floating button only while a story is being read (or paused mid-way)
   const mini = el("mini");
   mini.hidden = !tts.cur;
@@ -1908,7 +1941,9 @@ function armSleep(){
 }
 el("play").addEventListener("click", () => tts.on ? pauseListen() : startListen());
 el("mini").addEventListener("click", () => tts.on ? pauseListen() : startListen());
-el("stopL").addEventListener("click", () => stopListen());
+el("stopL").addEventListener("click", () => { forget(); stopListen(); });
+addEventListener("visibilitychange", () => { if(document.hidden && tts.cur) remember(); });
+addEventListener("pagehide", () => { if(tts.cur) remember(); });
 el("lset").addEventListener("click", () => {
   const open = el("lsettings").hidden;
   el("lsettings").hidden = !open;
